@@ -8,10 +8,10 @@ public class UmBoletim {
     private int id_boletim;
     private String descricao_boletim; 
     private String data_boletim;
-    private List<UmEndereco> enderecos;
-    private List<UmUsuario> usuarios;
-    private List<UmStatus> status;
-    private List<UmPolicial> policialResponsavel;
+    private List<UmEndereco> enderecos_boletim;
+    private List<UmUsuario> usuarios_boletim;
+    private List<UmStatus> status_boletim;
+    private List<UmPolicial> policialResponsavel_boletim;
     private String evidencias_boletim;
 
     public UmBoletim(int id_boletim, String descricao_boletim, String data_boletim, String evidencias_boletim){
@@ -19,10 +19,10 @@ public class UmBoletim {
         this.descricao_boletim = descricao_boletim;
         this.data_boletim = data_boletim;
         this.evidencias_boletim = evidencias_boletim;
-        this.enderecos = new ArrayList<>();
-        this.usuarios = new ArrayList<>();
-        this.status = new ArrayList<>();
-        this.policialResponsavel = new ArrayList<>();
+        this.enderecos_boletim = new ArrayList<>();
+        this.usuarios_boletim = new ArrayList<>();
+        this.status_boletim = new ArrayList<>();
+        this.policialResponsavel_boletim = new ArrayList<>();
         this.classificacao_boletim = new ArrayList<>();
     }
 }
