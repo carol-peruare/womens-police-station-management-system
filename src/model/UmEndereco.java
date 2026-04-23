@@ -1,8 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class UmEndereco {
     private String rua;
     private String cep;

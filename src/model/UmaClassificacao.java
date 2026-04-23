@@ -1,8 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class UmaClassificacao {
     private String tipo_classificacao;
 
