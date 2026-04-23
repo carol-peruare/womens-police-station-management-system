@@ -6,7 +6,7 @@ import java.util.List;
 public class UmUsuario {
     private String nome;
     private String cpf;
-    private int id;
+    private int id_usuario;
     private String email;
     private String data_Nasc;
     private String senha;
@@ -15,10 +15,10 @@ public class UmUsuario {
     private boolean autenticado;
     private List<Antecedentes> antecedente;
 
-    public UmUsuario(String nome, String cpf, int id, String email, String data_Nasc, String senha, String telefone, boolean autenticado){
+    public UmUsuario(String nome, String cpf, int id_usuario, String email, String data_Nasc, String senha, String telefone, boolean autenticado){
         this.nome = nome;
         this.cpf = cpf;
-        this.id = id;
+        this.id_usuario = id_usuario;
         this.email = email;
         this.data_Nasc = data_Nasc;
         this.senha = senha;
