@@ -7,4 +7,7 @@ public class UmaClassificacao {
         this.tipo_classificacao = tipo_classificacao;
     }
 
+    public void classifica(UmaClassificacao tipo_classificacao){
+        
+    }
 }
