@@ -23,4 +23,5 @@ public class UmPolicial {
         this.autenticado = autenticado;
         this.historicos = new ArrayList<>();
     }
+
 }

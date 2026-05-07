@@ -25,4 +25,6 @@ public class Antecedentes {
         this.classificacao_antecedentes = new ArrayList<>();
         this.usuario_antecedentes = new ArrayList<>();
     }
+
+    
 }
