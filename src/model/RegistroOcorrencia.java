@@ -25,10 +25,7 @@ public class RegistroOcorrencia {
 
     @Override
     public String toString() {
-        String info = "Ocorrência: " + descricao_ocorrencia +
-                      "\nData: " + data_ocorrencia +
-                      "\nLocal: " + local_ocorrencia +
-                      "\nPolicial: " + policial.getNome();
+        String info = "Ocorrência: " + descricao_ocorrencia + "\nData: " + data_ocorrencia + "\nLocal: " + local_ocorrencia + "\nPolicial: " + policial.getNome();
 
         if (denuncia != null){
             info += "\nLigada à denúncia.";
