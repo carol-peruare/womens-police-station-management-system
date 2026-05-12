@@ -28,19 +28,23 @@ public class UmaDenuncia {
 
         this.ativa = true;
     }
-    //getters 
     public int getId() {
-        return id;
+        return id_denuncia; 
     }
 
     public String getDescricao() {
-        return descricao;
+        return descricao_denuncia; 
     }
 
     public String getData() {
-        return data;
+        return data_denuncia; 
     }
-    // registrar denúncia
+
+    
+    public List<UmaClassificacao> getClassificacaoDenuncia() {
+        return classificacao_denuncia; 
+    }
+    
     public void RegistrarDenuncia(){
 
         System.out.println("Denúncia registrada com sucesso!");
