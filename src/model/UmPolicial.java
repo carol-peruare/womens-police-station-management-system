@@ -77,7 +77,7 @@ public class UmPolicial {
 
     public boolean autenticar(String emailDigitado, String senhaDigitada) {
 
-        if (this.email.equals(emailDigitado) && senhaDigitada != null && !senhaDigitada.isBlank()) {
+        if (this.email.equals(emailDigitado) && senhaDigitada != null && !senhaDigitada.trim().isEmpty()) {
             this.autenticado = true;
             System.out.println("Policial " + nome_policia + " autenticado com sucesso.");
             return true;
@@ -183,10 +183,10 @@ public class UmPolicial {
         System.out.println("Realizando atendimento: " + descricaoAtendimento);
 
         if (!historicos.isEmpty()) {
-            historicos.get(0).RegistroDeAtendimentoDeOcorrencia(
-                    descricaoAtendimento, this, dataAtendimento,
-                    "Local do atendimento", denuncia, boletim);
-        }
+    
+    historicos.get(0).registrarAtendimentoOcorrencia(descricaoAtendimento, this, dataAtendimento, "Local do atendimento", denuncia, boletim
+    );
+}
 
         System.out.println("Atendimento realizado por " + nome_policia
                 + " em " + dataAtendimento);

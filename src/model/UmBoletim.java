@@ -151,11 +151,11 @@ public class UmBoletim {
     }
  
     public void adicionarEvidencia(String evidencia) {
-        if (evidencia == null || evidencia.isBlank()) {
+        if (evidencia == null || evidencia.trim().isEmpty()) {
             System.err.println("Erro: evidência inválida.");
             return;
         }
-        if (evidencias_boletim == null || evidencias_boletim.isBlank()) {
+        if (evidencias_boletim == null || evidencias_boletim.trim().isEmpty()) {
             evidencias_boletim = evidencia;
         } else {
             evidencias_boletim += ", " + evidencia;
