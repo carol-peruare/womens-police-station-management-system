@@ -28,6 +28,14 @@ public class UmaDenuncia {
 
         this.ativa = true;
     }
+
+    public String getStatus() {
+    if (status_denuncia.isEmpty()) {
+        return "Pendente"; 
+    }
+    return status_denuncia.get(status_denuncia.size() - 1).toString();
+    }
+
     public int getId() {
         return id_denuncia; 
     }
