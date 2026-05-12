@@ -1,7 +1,5 @@
 package model;
 
-public class UmEndereco {
-=======
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ public class UmEndereco{
         this.numero = numero;
         this.complemento = complemento;
     }
-
+    // getters e setters
     public String getRua() {
         return rua;
     }
@@ -39,7 +37,7 @@ public class UmEndereco{
     public String getComplemento() {
         return complemento;
     }
-
+    // mostrar endereço
     public void mostrarEndereco(){
         System.out.println("Rua: " + rua);
         System.out.println("CEP: " + cep);
@@ -48,7 +46,7 @@ public class UmEndereco{
         System.out.println("Complemento: " + complemento);
         System.out.println("-------------------");
     }
-
+    //lista endereços
     public void listarEnderecos(){
         if(enderecos.isEmpty()) {
             System.out.println("Nenhum endereço cadastrado.");
@@ -60,3 +58,4 @@ public class UmEndereco{
         }
     }
 }
+
