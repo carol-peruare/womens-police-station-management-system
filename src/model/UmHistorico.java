@@ -4,54 +4,100 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UmHistorico {
-    private String id;
-    private List<UmPolicial> policiais;
-    private List<UmaDenuncia> lista_denuncias_atendidas;
-    private String data_ultima_atividade;
-    private List<String> lista_operacoes;
-    private List<RegistroOcorrencia> lista_ocorrencias_atendidas;
-
-    public UmHistorico(String id, String data_ultima_atividade) {
-        this.id = id;
-        this.data_ultima_atividade = data_ultima_atividade;
-        this.policiais = new ArrayList<>();
-        this.lista_denuncias_atendidas = new ArrayList<>();
-        this.lista_operacoes = new ArrayList<>();
-        this.lista_ocorrencias_atendidas = new ArrayList<>();
-    }
-    //registrar atendimento de ocorrência
-    public void RegistroDeAtendimentoDeOcorrencia(String descricao_ocorrencia, UmPolicial policial, String data_ocorrencia, String local_ocorrencia, UmaDenuncia denuncia, UmBoletim boletim){
+    // Controle de ID auto-incrementado
+    private static int contadorId = 1;
     
-        RegistroOcorrencia registro = new RegistroOcorrencia( descricao_ocorrencia, data_ocorrencia, local_ocorrencia, policial, denuncia, boletim);
-        lista_ocorrencias_atendidas.add(registro);
+    private int id; 
+    private List<UmPolicial> policiais;
+    private String dataUltimaAtividade;
+    private List<String> listaOperacoes; 
+    private List<RegistroOcorrencia> listaOcorrenciasAtendidas;
 
+    public UmHistorico(String dataUltimaAtividade) {
+        this.id = contadorId++; // incrementa automaticamente a cada novo objeto
+        this.dataUltimaAtividade = dataUltimaAtividade;
+        this.policiais = new ArrayList<>();
+        this.listaOperacoes = new ArrayList<>();
+        this.listaOcorrenciasAtendidas = new ArrayList<>();
+    }
+
+    // registrar atendimento de ocorrência
+    public void registrarAtendimentoOcorrencia(String descricaoOcorrencia, UmPolicial policial, String dataOcorrencia, String localOcorrencia, UmaDenuncia denuncia, UmBoletim boletim) {
+        RegistroOcorrencia registro = new RegistroOcorrencia(descricaoOcorrencia, dataOcorrencia, localOcorrencia, policial, denuncia, boletim);
+        
+        this.listaOcorrenciasAtendidas.add(registro);
         if (!policiais.contains(policial)) {
             policiais.add(policial);
         }
 
-        data_ultima_atividade = data_ocorrencia;
-        System.out.println("Ocorrência registrada com sucesso!");
+        this.dataUltimaAtividade = dataOcorrencia;
+        System.out.println("Ocorrência ID #" + id + " registrada com sucesso!");
     }
-    //registrar atendimento de boletim
-    public void registrarAtendimentoBoletim( UmBoletim boletim, UmPolicial policial, String data_atendimento){
-        String registro = "Boletim atendido por: " + policial.getNome() + "\nData: " + data_atendimento;
 
-        lista_operacoes.add(registro);
-        data_ultima_atividade = data_atendimento;
-        System.out.println("Boletim atendido e registrado com sucesso!");
+    // registrar atendimento de boletim
+    public void registrarAtendimentoBoletim(UmBoletim boletim, UmPolicial policial, String dataAtendimento) {
+        String registro = String.format("Boletim ID: %s | Atendido por: %s | Data: %s", boletim.getId(), policial.getNome(), dataAtendimento);
+
+        this.listaOperacoes.add(registro);
+        this.dataUltimaAtividade = dataAtendimento;
+        System.out.println("Boletim atendido e registrado no histórico!");
     }
-    //lista o histórico de atendimentos de um policial
-    public void listarHistorico(UmPolicial policial){
-    boolean encontrou = false;
-    for (RegistroOcorrencia registro : lista_ocorrencias_atendidas){
-        if(registro.getPolicial().equals(policial)){
-            System.out.println(registro);
-            System.out.println("-------------------");
-            encontrou = true;
+
+    public void registrarAtendimentoDenuncia(UmaDenuncia denuncia, UmPolicial policial, String dataAtendimento) {
+        String registro = String.format("Denúncia ID: %s | Atendida por: %s | Data: %s", denuncia.getId(), policial.getNome(), dataAtendimento);
+
+        this.listaOperacoes.add(registro);
+        this.dataUltimaAtividade = dataAtendimento;
+        System.out.println("Denúncia atendida e registrada no histórico!");
+    }
+
+    // Listar o histórico de atendimentos de um policial específico
+    public void listarHistorico(UmPolicial policial) {
+        System.out.println("\n--- BUSCANDO HISTÓRICO: Policial " + policial.getNome() + " ---");
+        boolean encontrou = false;
+
+        // busca nas ocorrências
+        for (RegistroOcorrencia registro : listaOcorrenciasAtendidas) {
+            if (registro.getPolicial().equals(policial)) {
+                System.out.println("[OCORRÊNCIA]");
+                System.out.println("Data: " + registro.getData_ocorrencia());
+                System.out.println("Local: " + registro.getLocal_ocorrencia());
+                System.out.println("Descrição: " + registro.getDescricao_ocorrencia());
+                System.out.println("------------------------------------");
+                encontrou = true;
+            }
+        }
+
+        // busca nos boletins 
+        for (String operacao : listaOperacoes) {
+            if (operacao.contains(policial.getNome())) {
+                System.out.println("[BOLETIM]");
+                System.out.println(operacao);
+                System.out.println("------------------------------------");
+                encontrou = true;
+            }
+        }
+        // busca nas denúncias
+        for (String operacao : listaOperacoes) {
+            if (operacao.contains(policial.getNome())) {
+                System.out.println("[DENÚNCIA]");
+                System.out.println(operacao);
+                System.out.println("------------------------------------");
+                encontrou = true;
+            }
+        }
+
+        if (!encontrou) {
+            System.out.println("Nenhum registro encontrado para este policial.");
         }
     }
-    if(!encontrou){
-        System.out.println("Nenhum histórico encontrado para esse policial.");
+
+    // Getters
+    public int getId() {
+        return id;
     }
-}
+
+    public String getDataUltimaAtividade() {
+        return dataUltimaAtividade;
+    }
 }
