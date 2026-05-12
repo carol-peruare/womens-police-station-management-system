@@ -28,7 +28,18 @@ public class UmaDenuncia {
 
         this.ativa = true;
     }
+    //getters 
+    public int getId() {
+        return id;
+    }
 
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public String getData() {
+        return data;
+    }
     // registrar denúncia
     public void RegistrarDenuncia(){
 
