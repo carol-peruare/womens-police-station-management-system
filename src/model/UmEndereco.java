@@ -1,6 +1,4 @@
 package model;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class UmEndereco{
@@ -47,11 +45,11 @@ public class UmEndereco{
         System.out.println("-------------------");
     }
     //lista endereços
-    public void listarEnderecos(){
-        if(enderecos.isEmpty()) {
-            System.out.println("Nenhum endereço cadastrado.");
 
-    } else {
+    public void listarEnderecos(List<UmEndereco> enderecos){
+        if(enderecos == null || enderecos.isEmpty()) {
+            System.out.println("Nenhum endereço cadastrado.");
+        } else {
             for (UmEndereco endereco : enderecos){
                 endereco.mostrarEndereco();
             }

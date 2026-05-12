@@ -34,6 +34,9 @@ public class UmUsuario {
         this.denuncias = new ArrayList<>();
         this.boletims_usuario = new ArrayList<>();
     }
+    public String getNome() {
+    return this.nome; 
+}
     // autenticação do usuário
     public boolean autenticar(String senhaDigitada, String emailDigitado){
         if(senha.equals(senhaDigitada)&& email.equals(emailDigitado)){
