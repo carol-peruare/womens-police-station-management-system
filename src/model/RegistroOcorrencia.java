@@ -18,11 +18,31 @@ public class RegistroOcorrencia {
     this.denuncia = denuncia;
     this.boletim = boletim;
 }
-
+    // getters
     public UmPolicial getPolicial(){
         return policial;
     }
 
+    public String getDescricao_ocorrencia() {
+        return descricao_ocorrencia;
+    }
+
+    public String getData_ocorrencia() {
+        return data_ocorrencia;
+    }
+
+    public String getLocal_ocorrencia() {
+        return local_ocorrencia;
+    }
+
+    public UmaDenuncia getDenuncia() {
+        return denuncia;
+    }
+
+    public UmBoletim getBoletim() {
+        return boletim;
+    }
+    // método para exibir detalhes da ocorrência
     @Override
     public String toString() {
         String info = "Ocorrência: " + descricao_ocorrencia + "\nData: " + data_ocorrencia + "\nLocal: " + local_ocorrencia + "\nPolicial: " + policial.getNome();

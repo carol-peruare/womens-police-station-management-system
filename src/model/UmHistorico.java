@@ -19,7 +19,7 @@ public class UmHistorico {
         this.lista_operacoes = new ArrayList<>();
         this.lista_ocorrencias_atendidas = new ArrayList<>();
     }
-
+    //registrar atendimento de ocorrência
     public void RegistroDeAtendimentoDeOcorrencia(String descricao_ocorrencia, UmPolicial policial, String data_ocorrencia, String local_ocorrencia, UmaDenuncia denuncia, UmBoletim boletim){
     
         RegistroOcorrencia registro = new RegistroOcorrencia( descricao_ocorrencia, data_ocorrencia, local_ocorrencia, policial, denuncia, boletim);
@@ -32,7 +32,7 @@ public class UmHistorico {
         data_ultima_atividade = data_ocorrencia;
         System.out.println("Ocorrência registrada com sucesso!");
     }
-
+    //registrar atendimento de boletim
     public void registrarAtendimentoBoletim( UmBoletim boletim, UmPolicial policial, String data_atendimento){
         String registro = "Boletim atendido por: " + policial.getNome() + "\nData: " + data_atendimento;
 
@@ -40,7 +40,7 @@ public class UmHistorico {
         data_ultima_atividade = data_atendimento;
         System.out.println("Boletim atendido e registrado com sucesso!");
     }
-
+    //lista o histórico de atendimentos de um policial
     public void listarHistorico(UmPolicial policial){
     boolean encontrou = false;
     for (RegistroOcorrencia registro : lista_ocorrencias_atendidas){

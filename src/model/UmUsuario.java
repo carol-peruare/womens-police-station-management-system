@@ -34,7 +34,7 @@ public class UmUsuario {
         this.denuncias = new ArrayList<>();
         this.boletims_usuario = new ArrayList<>();
     }
-
+    // autenticação do usuário
     public boolean autenticar(String senhaDigitada, String emailDigitado){
         if(senha.equals(senhaDigitada)&& email.equals(emailDigitado)){
             this.autenticado = true;
@@ -43,7 +43,7 @@ public class UmUsuario {
         this.autenticado = false;
         return false;
     }
-
+    // agendar atendimento
     public void agendarAtendimento(String data, String horario, String dercricao){
         if(autenticado){
             UmAtendimento novo = new UmAtendimento(1, data, horario, dercricao, this);
@@ -54,7 +54,7 @@ public class UmUsuario {
             System.err.println("Erro! Você precisa estar logado.\n");
         }
     }
-
+    // realizar denúncia
     public void realizarDenuncia(String descricao, String local, String categoria, Boolean denunciaAnonima){
         if(autenticado){
             UmaDenuncia novaDenuncia = new UmaDenuncia(descricao, local, categoria, denunciaAnonima = false);
@@ -71,7 +71,7 @@ public class UmUsuario {
             System.out.println("Denúncia realizada com sucesso!");
         }
     }
-
+    // realizar boletim
     public void realizarBoletim(String descricao, String local, String categoria){
         if(autenticado){
             UmBoletim novoBoletim = new UmBoletim(descricao, local, categoria);
@@ -84,13 +84,13 @@ public class UmUsuario {
             System.err.println("Erro! Você precisa estar logado.\n");
         }
     }
-
+    // adiconar endereço ao perfil do usuário
     public void adicionarEndereco(String rua, String numero, String cidade, String estado, String cep){
         UmEndereco novoEndereco = new UmEndereco(rua, numero, cidade, estado, cep);
         enderecos.add(novoEndereco);
         System.out.println("Endereço adicionado com sucesso!\n");
     }
-
+    //verificar o status do atendimento
     public void verificarStatusAtendimento(int idAtendimento){
         for(UmAtendimento atendimento : atendimentos){
             if(atendimento.getId() == idAtendimento){
@@ -100,7 +100,7 @@ public class UmUsuario {
         }
         System.err.println("Atendimento não encontrado.\n");
     }
-    
+    // verifica o status do boletim
     public void verificarStatusBoletim(int idBoletim){
         for(UmBoletim boletim : boletims_usuario){
             if(boletim.getId() == idBoletim){
@@ -110,7 +110,7 @@ public class UmUsuario {
         }
         System.err.println("Boletim não encontrado.\n");
     }
-
+    //verifica o status da denúncia
     public void verificarStatusDenuncia(int idDenuncia){
         for(UmDenuncia denuncia : denuncias){
             if(denuncia.getId() == idDenuncia){
