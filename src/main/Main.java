@@ -1,3 +1,5 @@
+    // Maressa Luiza dos Reis Machado - 202421901046
+    // Carolina Peruare Ferreira - 202412901003
 package main;
 
 import model.Antecedentes;
@@ -7,8 +9,6 @@ import model.UmPolicial;
 import model.UmStatus;
 
 public class Main {
-    // Maressa Luiza dos Reis Machado - 202421901046
-    // Carolina Peruare Ferreira - 202412901003
     public static void main(String[] args) {
    //testando policial
         System.out.println("1. TESTANDO POLICIAL");
@@ -39,9 +39,9 @@ public class Main {
 
         UmBoletim boletim = new UmBoletim(
             305, 
-            "Meu vizinho está gritando com a esposa e abusando verbalmente dela desde as 3h da manhã.", 
+            "Meu vizinho está gritando com a esposa e abusando verbalmente dela desde madrugada.", 
             "12/05/2026", 
-            "Nenhuma evidência inicial"
+            "Nenhuma evidencia inicial"
         );
 
         // Adicionando informações soltas ao boletim
