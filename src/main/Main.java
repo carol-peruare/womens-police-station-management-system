@@ -2,21 +2,24 @@ package main;
 
 import model.Antecedentes;
 import model.UmaClassificacao;
-import model.UmaDenuncia;
 import model.UmBoletim;
 import model.UmPolicial;
 import model.UmStatus;
 
 public class Main {
-
+    // Maressa Luiza dos Reis Machado - 202421901046
+    // Carolina Peruare Ferreira - 202412901003
     public static void main(String[] args) {
    //testando policial
         System.out.println("1. TESTANDO POLICIAL");
-
+        
         UmPolicial policial = new UmPolicial(
             "Sargenta Flores", 
             "999.888.777-66", 
-            "2022101", 
+            "15/08/1985",
+             "senhaSegura", 
+             "65998775341",
+             "2022101",
             "flores@policia.gov.br", 
             "Sargenta", 
             false,  // em_servico inicial
@@ -75,13 +78,6 @@ public class Main {
 
         ficha.verificarAntecedentes();
         System.out.println();
-
-        //  simular que uma ocorrência foi adicionada
-        // Criamos uma denúncia para poder adicionar na ficha
-        UmaDenuncia den = new UmaDenuncia(1, "Discussão em via pública", "12/05/2026", false);
-        
-        // Adicionando a denúncia à ficha de antecedentes
-        ficha.adicionarOcorrencia(den, "12/05/2026");
 
         System.out.println("\n--- Relatório Atualizado ---");
         ficha.verificarAntecedentes(); // Agora dirá que POSSUI antecedentes

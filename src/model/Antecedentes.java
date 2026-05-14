@@ -10,7 +10,6 @@ public class Antecedentes {
     private String dataUltimaOcorrencia;
     private String observacoes_antecedentes;
     private List<UmBoletim> boletim_antecedentes;
-    private List<UmaDenuncia> denuncia_antecedentes;
     private List<UmaClassificacao> classificacao_antecedentes; //passagens
     private List<UmUsuario> usuario_antecedentes;
 
@@ -21,7 +20,6 @@ public class Antecedentes {
         this.dataUltimaOcorrencia = dataUltimaOcorrencia;
         this.observacoes_antecedentes = observacoes_antecedentes;
         this.boletim_antecedentes = new ArrayList<>();
-        this.denuncia_antecedentes = new ArrayList<>();
         this.classificacao_antecedentes = new ArrayList<>();
         this.usuario_antecedentes = new ArrayList<>();
     }
@@ -48,10 +46,6 @@ public class Antecedentes {
  
     public List<UmBoletim> getBoletimAntecedentes() {
         return boletim_antecedentes;
-    }
- 
-    public List<UmaDenuncia> getDenunciaAntecedentes() {
-        return denuncia_antecedentes;
     }
  
     public List<UmaClassificacao> getClassificacaoAntecedentes() {
@@ -97,17 +91,6 @@ public class Antecedentes {
             }
         }
  
-        System.out.println("\n--- Denúncias ---");
-        if (denuncia_antecedentes.isEmpty()) {
-            System.out.println("Nenhuma denúncia registrada.");
-        } else {
-            for (UmaDenuncia denuncia : denuncia_antecedentes) {
-                System.out.println("Denúncia ID: " + denuncia.getId()
-                        + " | Descrição: " + denuncia.getDescricao()
-                        + " | Data: " + denuncia.getData());
-            }
-        }
- 
         System.out.println("\nTotal de ocorrências: " + quantidade_antecedentes);
         System.out.println("Última ocorrência: " + dataUltimaOcorrencia);
         System.out.println("Observações: " + observacoes_antecedentes);
@@ -125,19 +108,6 @@ public class Antecedentes {
         System.out.println("Boletim adicionado aos antecedentes. Total: " + quantidade_antecedentes);
     }
  
-    public void adicionarOcorrencia(UmaDenuncia denuncia, String dataOcorrencia) {
-        if (denuncia == null) {
-            System.err.println("Erro: denúncia inválida.");
-            return;
-        }
-        denuncia_antecedentes.add(denuncia);
-        quantidade_antecedentes++;
-        possuiAntecedentes = true;
-        dataUltimaOcorrencia = dataOcorrencia;
-        System.out.println("Denúncia adicionada aos antecedentes. Total: " + quantidade_antecedentes);
-    }
- 
-  
     public void verificarAntecedentes() {
         if (possuiAntecedentes && quantidade_antecedentes > 0) {
             System.out.println("! Atenção: este registro POSSUI antecedentes.");
