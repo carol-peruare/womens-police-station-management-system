@@ -22,8 +22,8 @@ public class UmHistorico {
     }
 
     // registrar atendimento de ocorrência
-    public void registrarAtendimentoOcorrencia(String descricaoOcorrencia, UmPolicial policial, String dataOcorrencia, String localOcorrencia, UmaDenuncia denuncia, UmBoletim boletim) {
-        RegistroOcorrencia registro = new RegistroOcorrencia(descricaoOcorrencia, dataOcorrencia, localOcorrencia, policial, denuncia, boletim);
+    public void registrarAtendimentoOcorrencia(String descricaoOcorrencia, UmPolicial policial, String dataOcorrencia, String localOcorrencia, UmBoletim boletim) {
+        RegistroOcorrencia registro = new RegistroOcorrencia(descricaoOcorrencia, dataOcorrencia, localOcorrencia, policial, boletim);
         
         this.listaOcorrenciasAtendidas.add(registro);
         if (!policiais.contains(policial)) {
@@ -41,14 +41,6 @@ public class UmHistorico {
         this.listaOperacoes.add(registro);
         this.dataUltimaAtividade = dataAtendimento;
         System.out.println("Boletim atendido e registrado no histórico!");
-    }
-
-    public void registrarAtendimentoDenuncia(UmaDenuncia denuncia, UmPolicial policial, String dataAtendimento) {
-        String registro = String.format("Denúncia ID: %s | Atendida por: %s | Data: %s", denuncia.getId(), policial.getNome(), dataAtendimento);
-
-        this.listaOperacoes.add(registro);
-        this.dataUltimaAtividade = dataAtendimento;
-        System.out.println("Denúncia atendida e registrada no histórico!");
     }
 
     // Listar o histórico de atendimentos de um policial específico
@@ -72,15 +64,6 @@ public class UmHistorico {
         for (String operacao : listaOperacoes) {
             if (operacao.contains(policial.getNome())) {
                 System.out.println("[BOLETIM]");
-                System.out.println(operacao);
-                System.out.println("------------------------------------");
-                encontrou = true;
-            }
-        }
-        // busca nas denúncias
-        for (String operacao : listaOperacoes) {
-            if (operacao.contains(policial.getNome())) {
-                System.out.println("[DENÚNCIA]");
                 System.out.println(operacao);
                 System.out.println("------------------------------------");
                 encontrou = true;
