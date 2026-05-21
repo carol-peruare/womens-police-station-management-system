@@ -33,7 +33,7 @@ public class UmaPessoa {
 
     // Método para autenticar o usuário
     public boolean autenticar(String senhaDigitada, String emailDigitado) {
-        if (this.senha.equals(senhaDigitada) && this.email.equalsIgnoreCase(emailDigitado)) {
+        if (this.senha.equals(senhaDigitada) && this.email.equals(emailDigitado)){
             this.autenticado = true;
             return true;
         }

@@ -109,4 +109,15 @@ public class UmPolicial extends UmaPessoa{
         historicos.add(historico);
         System.out.println("Histórico vinculado ao policial " + nome);
     }
+
+    // Sobrescreve o método de autenticação para usar matrícula em vez de email
+    @Override 
+    public boolean autenticar(String senhaDigitada, String matriculaDigitada) {
+        if(this.senha.equals(senhaDigitada) && this.matricula.equals(matriculaDigitada)){
+            this.autenticado = true;
+            return true;
+        }
+        this.autenticado = false;
+        return false;
+    }
 }
