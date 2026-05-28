@@ -10,7 +10,7 @@ public class UmPolicial extends UmaPessoa{
     private List<UmHistorico> historicos;
 
     public UmPolicial(String nome, String cpf, String email, String data_Nasc, String senha, String telefone,String matricula,String patente, boolean em_servico, boolean autenticado){
-        super(nome, cpf, email, data_Nasc, senha, telefone);
+        super(nome, cpf, email, data_Nasc, senha, telefone, matricula); // Passa a matrícula como código identificador para a classe base
 
         this.matricula = matricula;
         this.patente = patente;
@@ -110,14 +110,4 @@ public class UmPolicial extends UmaPessoa{
         System.out.println("Histórico vinculado ao policial " + nome);
     }
 
-    // Sobrescreve o método de autenticação para usar matrícula em vez de email
-    @Override 
-    public boolean autenticar(String senhaDigitada, String matriculaDigitada) {
-        if(this.senha.equals(senhaDigitada) && this.matricula.equals(matriculaDigitada)){
-            this.autenticado = true;
-            return true;
-        }
-        this.autenticado = false;
-        return false;
-    }
 }

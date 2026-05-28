@@ -2,87 +2,69 @@
     // Carolina Peruare Ferreira - 202412901003
 package main;
 
+import javax.swing.*;
+
 import model.Antecedentes;
 import model.UmaClassificacao;
 import model.UmBoletim;
 import model.UmPolicial;
 import model.UmStatus;
+import model.UmaPessoa;
+import model.UmHistorico;
+import model.RegistroOcorrencia;
+import model.UmaClassificacao;
+import model.UmAtendimento;
+import model.UmEndereco;
+import model.UmUsuario;
 
 public class Main {
     public static void main(String[] args) {
-   //testando policial
-        System.out.println("1. TESTANDO POLICIAL");
         
         UmPolicial policial = new UmPolicial(
             "Sargenta Flores", 
             "999.888.777-66", 
-            "15/08/1985",
-             "senhaSegura", 
+            "flores@policia.gov.br",
+             "15/08/1985", 
+             "senhaSegura",
              "65998775341",
-             "2022101",
-            "flores@policia.gov.br", 
-            "Sargenta", 
+            "2022101", 
+            "Sargenta",
             false,  // em_servico inicial
             false   // autenticado inicial
         );
+        }
 
-        // Testando os métodos do policial isoladamente
-        policial.autenticar("flores@policia.gov.br", "senhaSegura"); // Autentica
-        policial.baterPonto(); // Entra em serviço
-        policial.baterPonto(); // Bate o ponto de novo (Sai de serviço)
-        
-        System.out.println();
-     
-        //testando boletim e classificação
+        System.out.println("Insira seu email ou matrícula:\n");
+        JTextField campoLogin = new JTextField();    
+        System.out.println("Insira sua senha:\n");
+        JTextField campoSenha = new JTextField();
 
-        System.out.println("2. TESTANDO BOLETIM");
 
-        UmBoletim boletim = new UmBoletim(
-            305, 
-            "Meu vizinho está gritando com a esposa e abusando verbalmente dela desde madrugada.", 
-            "12/05/2026", 
-            "Nenhuma evidencia inicial"
-        );
+        Object[] campos = {
+            "E-mail ou Matrícula:", campoLogin,
+            "Senha:", campoSenha
+        };
 
-        // Adicionando informações soltas ao boletim
-        boletim.adicionarEvidencia("Audio da gritaria");
-        
-        UmaClassificacao classificacao = new UmaClassificacao(UmaClassificacao.OpcaoViolencia.AGRESSAO);
-        boletim.adicionarClassificacao(classificacao);
-        
-        UmStatus status = new UmStatus("Em análise");
-        boletim.atualizarStatus(status);
+        int opcao = JOptionPane.showConfirmDialog(null, campos, "Login do Sistema", JOptionPane.OK_CANCEL_OPTION);
 
-        // Mostrando o boletim completo
-        System.out.println("\n-> Visualizando o Boletim:");
-        boletim.visualizar();
+        if (opcao == JOptionPane.OK_OPTION) {
+            String identificador = campoLogin.getText();
+            String senha = campoSenha.getText();
+        }
 
-        System.out.println("\n-> Cancelando o Boletim:");
-        boletim.cancelar();
-        boletim.visualizar(); 
+        if(identificador.getCodigoIdentificador().contains("@")) {
+            // Se tem '@', o sistema sabe automaticamente que é um Cidadão (E-mail)
+            UmUsuario usuario = repository.findByEmail(identificador); 
+            System.out.println("Portal do Cidadão\n");
+            System.out.println("Seja bem-vindo, \n" + usuario.getNome() + "!");
+        }
+        else {
+            // Caso contrário, é um Policial (Matrícula)
+            UmPolicial policial = repository.findByMatricula(identificador);
+            System.out.println("Portal do Policial\n");
+            System.out.println("Seja bem-vindo, \n" + policial.getNome() + "!");
+        }
 
-        System.out.println("3. TESTE DE STATUS");
-        
-        UmStatus status1 = new UmStatus("Em análise");
-        UmStatus status2 = new UmStatus("Concluído"); 
-
-        status1.identificarStatus(); 
-        status2.identificarStatus();
-        System.out.println();
-
-        //testando antecedentes 
-        System.out.println("4. TESTE DE ANTECEDENTES ");
-
-        // var1 (int qtd), var2 (boolean possui), var3 (int id), var4 (String data), var5 (String obs)
-        Antecedentes ficha = new Antecedentes(0, false, 777, "Nenhuma", "Cidadão ficha limpa");
-
-        ficha.verificarAntecedentes();
-        System.out.println();
-
-        System.out.println("\n--- Relatório Atualizado ---");
-        ficha.verificarAntecedentes(); // Agora dirá que POSSUI antecedentes
-        ficha.listarOcorrencia();     // Vai listar a denúncia que adicionamos
-    }
 }
     
 

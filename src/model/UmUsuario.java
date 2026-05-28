@@ -9,7 +9,7 @@ public class UmUsuario extends UmaPessoa{
     private List<UmBoletim> boletims_usuario;
 
     public UmUsuario(String nome, String cpf, String email, String data_Nasc, String senha, String telefone) {
-        super(nome, cpf, email, data_Nasc, senha, telefone);
+        super(nome, cpf, email, data_Nasc, senha, telefone, email); // Usa o CPF como código identificador para o usuário
 
         this.antecedentes = new ArrayList<>();
         this.atendimentos = new ArrayList<>();
