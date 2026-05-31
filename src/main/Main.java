@@ -100,13 +100,13 @@ public class Main {
                     if (p.getMatricula().equals(loginDigitado) && p.getSenha().equals(senhaDigitada)) {
                         autenticado = true;
                         JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
-                        // Aqui você chamaria o menu do seu colega futuramente
+                        // chamarMeuPolicial() ou algo assim  
                         break;
                     }
                 }
             }
 
-            // Se não achou em nenhuma das listas, barra o acesso
+            // Se não achou em nenhuma das listas, erro
             if (!autenticado) {
                 JOptionPane.showMessageDialog(
                     null, 
