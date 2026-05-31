@@ -25,14 +25,24 @@ public class UmaPessoa {
     }
 
     // getters
-    public String getNome() { return nome; }
     public String getCpf() { return cpf; }
     public String getdata_Nasc() { return data_Nasc; }
     public int getId() { return id_pessoa; }
     public String getTelefone() { return telefone; }
     public String getCodigoIdentificador() { return codigoIdentificador; }
-    public String getEmail() { return email; }
     public boolean isAutenticado() { return autenticado; }
+
+    public String getSenha() {
+        return this.senha; 
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public String getNome() {
+        return this.nome;
+    }
 
     // Método para autenticar o usuário
     public boolean autenticar(String senhaDigitada, String codigoIdentificadorDigitado) {
