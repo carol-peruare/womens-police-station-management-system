@@ -1,5 +1,15 @@
 // Maressa Luiza dos Reis Machado - 202421901046
 // Carolina Peruare Ferreira - 202412901003
+
+/*  Fazer login como policial: 
+        2022101
+        senhaSegura
+
+    Fazer login como cidadão: 
+        fernanda@cidadao.gov.br
+        amoMeuPet
+*/
+
 package main;
 
 import javax.swing.*;
