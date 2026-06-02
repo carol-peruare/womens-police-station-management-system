@@ -1,5 +1,15 @@
 // Maressa Luiza dos Reis Machado - 202421901046
 // Carolina Peruare Ferreira - 202412901003
+
+/*  Fazer login como policial: 
+        2022101
+        senhaSegura
+
+    Fazer login como cidadão: 
+        fernanda@cidadao.gov.br
+        amoMeuPet
+*/
+
 package main;
 
 import javax.swing.*;
@@ -92,13 +102,17 @@ public class Main {
                     if (p.getMatricula().equals(loginDigitado) && p.getSenha().equals(senhaDigitada)) {
                         autenticado = true;
                         JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
+<<<<<<< HEAD
+                        // chamarMeuPolicial() ou algo assim  
+=======
                         chamarMenuPolicial();
+>>>>>>> 6dbe51c09755b8f141b5ac7cc5ba153ba109265a
                         break;
                     }
                 }
             }
 
-            // Se não achou em nenhuma das listas, barra o acesso
+            // Se não achou em nenhuma das listas, erro
             if (!autenticado) {
                 JOptionPane.showMessageDialog(
                     null, 
