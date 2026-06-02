@@ -35,6 +35,7 @@ public class Main {
     private static UmStatus statusBoletim = null;
     private static UmaClassificacao classificacaoBoletim = null;
     private static UmHistorico historicoGeral = new UmHistorico(java.time.LocalDate.now().toString());
+    private static int entradaOuSaida = 0; // 0 para entrada, 1 para saída
 
     // Inicializa o sistema com os usuários cadastrados
     public static void inicializarSistema() {
@@ -102,11 +103,7 @@ public class Main {
                     if (p.getMatricula().equals(loginDigitado) && p.getSenha().equals(senhaDigitada)) {
                         autenticado = true;
                         JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
-<<<<<<< HEAD
-                        // chamarMeuPolicial() ou algo assim  
-=======
                         chamarMenuPolicial();
->>>>>>> 6dbe51c09755b8f141b5ac7cc5ba153ba109265a
                         break;
                     }
                 }
@@ -234,21 +231,22 @@ public class Main {
 
     public static void baterPonto() {
         UmPolicial policialLogado = bancoPoliciais.get(0);
-        String horario = java.time.LocalTime.now().withNano(0).toString();
-        String dataHoje = java.time.LocalDate.now().toString();
 
-        // Cria um boletim fictício para registrar o ponto no histórico (arrumar isso futuramente para não precisar criar um boletim só para isso)
-        UmBoletim registroPonto = new UmBoletim(0, "REGISTRO DE PONTO", dataHoje, "N/A");
-        
-        // Registra no histórico
-        historicoGeral.registrarAtendimentoBoletim(registroPonto, policialLogado, dataHoje + " às " + horario);
+        if(entradaOuSaida == 0) {
+            historicoGeral.registrarEventoSimples(policialLogado, "REGISTRO DE PONTO (ENTRADA)");
+            entradaOuSaida = 1; // Próxima vez será saída
+        } else {
+            historicoGeral.registrarEventoSimples(policialLogado, "REGISTRO DE PONTO (SAÍDA)");
+            entradaOuSaida = 0; // Próxima vez será entrada
+        }
 
         JOptionPane.showMessageDialog(
             null, 
-            "Ponto registrado com sucesso para: " + policialLogado.getNome() + "\nHorário: " + horario, 
-            "Registro de Ponto", 
+            "Ponto registrado com sucesso!\nPolicial: " + policialLogado.getNome(), 
+            "Ponto Eletrônico", 
             JOptionPane.INFORMATION_MESSAGE
         );
+
         chamarMenuPolicial(); 
     }
 
@@ -265,6 +263,7 @@ public class Main {
             }
 
             if (alvo != null) {
+                UmPolicial policialLogado = bancoPoliciais.get(0);
                 Antecedentes ficha = new Antecedentes(0, false, 101, "N/A", "Nada consta");
                 
                 String mensagem = "=== FICHA CRIMINAL ===\n" +
@@ -278,11 +277,7 @@ public class Main {
                 
                 // Logs de validação
                 ficha.listarOcorrencia(); 
-                historicoGeral.registrarAtendimentoBoletim(
-                    new UmBoletim(0, "Consulta de Ficha: " + alvo.getNome(), "N/A", "N/A"), 
-                    bancoPoliciais.get(0), 
-                    java.time.LocalDate.now().toString()
-                );
+                historicoGeral.registrarEventoSimples(policialLogado, "Consulta de Antecedentes: " + alvo.getNome());
             } else {
                 JOptionPane.showMessageDialog(null, "CPF não encontrado no sistema.");
             }
@@ -294,14 +289,36 @@ public class Main {
 
     public static void verificarHistoricoPolicial(){
         UmPolicial policialLogado = bancoPoliciais.get(0);
-        historicoGeral.listarHistorico(policialLogado);
     
-        JOptionPane.showMessageDialog(null, 
-            "O histórico detalhado de " + policialLogado.getNome() + 
-            " foi gerado no console do sistema (System.out).", 
-            "Histórico do Policial", 
-            JOptionPane.INFORMATION_MESSAGE);
-        
+        StringBuilder relatorioHistorial = new StringBuilder();
+        relatorioHistorial.append("=== HISTÓRICO DE ATIVIDADES ===\n");
+        relatorioHistorial.append("Oficial: ").append(policialLogado.getNome()).append("\n");
+        relatorioHistorial.append("--------------------------------------------------\n\n");
+        boolean encontrouRegistros = false;
+
+        for(String operacao : historicoGeral.getListaOperacoes()) {
+            if (operacao.contains(policialLogado.getNome())) {
+                relatorioHistorial.append("-> ").append(operacao).append("\n");
+                encontrouRegistros = true;
+            }
+        }
+
+        if (!encontrouRegistros) {
+            relatorioHistorial.append("Nenhuma atividade registrada para este oficial até o momento.");
+        }
+
+        JTextArea textArea = new JTextArea(relatorioHistorial.toString());
+        textArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new java.awt.Dimension(500, 300));
+
+        JOptionPane.showMessageDialog(
+            null, 
+            scrollPane, 
+            "Relatório de Atividades do Policial", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
         chamarMenuPolicial();
     }
 

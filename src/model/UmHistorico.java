@@ -75,6 +75,16 @@ public class UmHistorico {
         }
     }
 
+    public void registrarEventoSimples(UmPolicial policial, String descricao) {
+        String dataHora = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        
+        String registro = String.format("[%s] AGENTE: %s | AÇÃO: %s", dataHora, policial.getNome(), descricao);
+
+        this.listaOperacoes.add(registro);
+        this.dataUltimaAtividade = dataHora;
+        System.out.println("Evento administrativo registrado: " + descricao);
+    }
+
     // Getters
     public int getId() {
         return id;
@@ -83,4 +93,9 @@ public class UmHistorico {
     public String getDataUltimaAtividade() {
         return dataUltimaAtividade;
     }
+
+    public List<String> getListaOperacoes() {
+    return this.listaOperacoes;
+    }
+
 }
