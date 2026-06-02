@@ -30,7 +30,7 @@ public class Main {
     public static void inicializarSistema() {
        UmPolicial policial = new UmPolicial(
             "Flores Machado dos Santos", // nome
-            "999.888.777-66",           // cpf
+            "12345678901",           // cpf
             "flores@policia.gov.br",     // email
             "15/08/1985",                // data_Nasc
             "senhaSegura",               // senha
@@ -44,7 +44,7 @@ public class Main {
 
         UmUsuario usuario = new UmUsuario(
             "Fernanda Maria Ferreira",   // nome
-            "999.888.777-66",            // cpf
+            "99988877766",            // cpf
             "fernanda@cidadao.gov.br",   // email
             "24/02/2001",                // data_Nasc
             "amoMeuPet",                 // senha
@@ -218,19 +218,65 @@ public class Main {
         chamarMenuPolicial(); 
     }
 
-    public static void baterPonto(){
+    public static void baterPonto() {
+        UmPolicial policialLogado = bancoPoliciais.get(0);
+        String horario = java.time.LocalTime.now().withNano(0).toString();
+        String dataHoje = java.time.LocalDate.now().toString();
+
+        // Cria um boletim fictício para registrar o ponto no histórico (arrumar isso futuramente para não precisar criar um boletim só para isso)
+        UmBoletim registroPonto = new UmBoletim(0, "REGISTRO DE PONTO", dataHoje, "N/A");
+        
+        // Registra no histórico
+        historicoGeral.registrarAtendimentoBoletim(registroPonto, policialLogado, dataHoje + " às " + horario);
+
         JOptionPane.showMessageDialog(
             null, 
-            "Ponto registrado com sucesso para: " + bancoPoliciais.get(0).getNome() + "\nHorário: " + java.time.LocalTime.now().withNano(0), 
+            "Ponto registrado com sucesso para: " + policialLogado.getNome() + "\nHorário: " + horario, 
             "Registro de Ponto", 
             JOptionPane.INFORMATION_MESSAGE
         );
         chamarMenuPolicial(); 
     }
 
-    public static void verificarFichaAntecedentes(){
+    public static void verificarFichaAntecedentes() {
+        String cpfBusca = JOptionPane.showInputDialog("Digite o CPF do cidadão (apenas números):");
+        UmUsuario alvo = null;
+
+        if (cpfBusca != null && !cpfBusca.isEmpty()) {
+            for (UmUsuario u : bancoUsuarios) {
+                if (u.getCpf().equals(cpfBusca)) {
+                    alvo = u;
+                    break;
+                }
+            }
+
+            if (alvo != null) {
+                Antecedentes ficha = new Antecedentes(0, false, 101, "N/A", "Nada consta");
+                
+                String mensagem = "=== FICHA CRIMINAL ===\n" +
+                                  "Cidadão: " + alvo.getNome() + "\n" +
+                                  "Status: " + (ficha.isPossuiAntecedentes() ? "POSSUI PASSAGENS" : "NADA CONSTA") + "\n" +
+                                  "Quantidade: " + ficha.getQuantidadeAntecedentes() + "\n" +
+                                  "Última Ocorrência: " + ficha.getDataUltimaOcorrencia() + "\n" +
+                                  "Observações: " + ficha.getObservacoesAntecedentes();
+
+                JOptionPane.showMessageDialog(null, mensagem);
+                
+                // Logs de validação
+                ficha.listarOcorrencia(); 
+                historicoGeral.registrarAtendimentoBoletim(
+                    new UmBoletim(0, "Consulta de Ficha: " + alvo.getNome(), "N/A", "N/A"), 
+                    bancoPoliciais.get(0), 
+                    java.time.LocalDate.now().toString()
+                );
+            } else {
+                JOptionPane.showMessageDialog(null, "CPF não encontrado no sistema.");
+            }
+        }
+        
         chamarMenuPolicial();
     }
+        
 
     public static void verificarHistoricoPolicial(){
         UmPolicial policialLogado = bancoPoliciais.get(0);
