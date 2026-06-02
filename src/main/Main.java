@@ -16,6 +16,7 @@ import javax.swing.*;
 import model.Antecedentes;
 import model.UmaClassificacao;
 import model.UmBoletim;
+import model.UmHistorico;
 import model.UmPolicial;
 import model.UmStatus;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class Main {
     private static UmBoletim boletimCadastrado = null;
     private static UmStatus statusBoletim = null;
     private static UmaClassificacao classificacaoBoletim = null;
+    private static UmHistorico historicoGeral = new UmHistorico(java.time.LocalDate.now().toString());
 
     // Inicializa o sistema com os usuários cadastrados
     public static void inicializarSistema() {
@@ -100,7 +102,11 @@ public class Main {
                     if (p.getMatricula().equals(loginDigitado) && p.getSenha().equals(senhaDigitada)) {
                         autenticado = true;
                         JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
+<<<<<<< HEAD
                         // chamarMeuPolicial() ou algo assim  
+=======
+                        chamarMenuPolicial();
+>>>>>>> 6dbe51c09755b8f141b5ac7cc5ba153ba109265a
                         break;
                     }
                 }
@@ -116,6 +122,141 @@ public class Main {
                 );
             }
         }
+    }
+
+    public static void chamarMenuPolicial(){
+
+        String [] botoesMenuPolicial = {
+            "Consultar Boletins", 
+            "Atualizar Status de Ocorrência", 
+            "Bater Ponto",
+            "Verificar Ficha de Antecedentes",
+            "Meu Histórico",
+            "Sair"
+        };
+
+        int op = JOptionPane.showOptionDialog(
+            null,
+            "=== PAINEL DO POLICIAL ===\nUsuário logado: " + bancoPoliciais.get(0).getNome() + "\n\nSelecione a ação desejada abaixo:",
+            "Menu Principal",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            botoesMenuPolicial,
+            botoesMenuPolicial[0] 
+        );
+
+        switch(op) {
+            case 0:
+                consultarBoletim();
+                break;
+            case 1:
+                atualizarOcorrencia();
+                break;
+            case 2:
+                baterPonto();
+                break;
+            case 3:
+                verificarFichaAntecedentes();
+                break;
+            case 4:
+                verificarHistoricoPolicial();
+                break;
+            case 5:
+            case -1: // Caso o usuário feche a janela no "X"
+                JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
+                break;
+        }
+    }
+
+    public static void consultarBoletim(){
+        if (boletimCadastrado == null){
+            JOptionPane.showMessageDialog(
+                null, 
+                "Nenhum boletim registrado nesta sessão.\nPor favor, peça para o cidadão registrar uma ocorrência primeiro.", 
+                "Nenhum Registro Encontrado", 
+                JOptionPane.WARNING_MESSAGE
+            );
+        } else {
+            String relatorio = "=== CONSULTA DE BOLETIM ===\n\n" +
+                               "Buscando registros vinculados ao usuário: " + usuarioLogado.getNome() + "\n\n" +
+                               "• Classificação Atribuída: " + classificacaoBoletim.getTipoClassificacao() + "\n" +
+                               "• Status do Processo: " + statusBoletim.getTipo() + "\n\n" +
+                               "Detalhamento do Sistema: O caso foi registrado e aguarda análise.";
+            
+            JOptionPane.showMessageDialog(null, relatorio, "Acompanhamento de Ocorrência", JOptionPane.INFORMATION_MESSAGE);
+            
+            System.out.println("\n-> [POO VALIDAÇÃO] Policial consultou o boletim registrado:");
+            statusBoletim.identificarStatus();
+        }
+        chamarMenuPolicial(); 
+    }
+
+    public static void atualizarOcorrencia(){
+        if (boletimCadastrado == null || statusBoletim == null) {
+            JOptionPane.showMessageDialog(
+                null, 
+                "Nenhum boletim registrado nesta sessão para atualizar.\nPor favor, peça para o cidadão registrar uma ocorrência primeiro.", 
+                "Nenhum Registro Encontrado", 
+                JOptionPane.WARNING_MESSAGE
+            );
+        } else {
+            String[] opcoesStatus = {"Em Análise", "Em Andamento", "Concluído"};
+            String novoStatus = (String) JOptionPane.showInputDialog(
+                null,
+                "Selecione o novo status para o boletim de número: " + boletimCadastrado.getId(),
+                "Atualização de Status",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opcoesStatus,
+                opcoesStatus[0]
+            );
+
+            if (novoStatus != null) {
+            statusBoletim = new UmStatus(novoStatus.toLowerCase());
+            boletimCadastrado.atualizarStatus(statusBoletim);
+
+            // Registra essa atualização no histórico do policial logado
+            UmPolicial policialLogado = bancoPoliciais.get(0);
+            historicoGeral.registrarAtendimentoOcorrencia(
+                "Atualização de status para: " + novoStatus, 
+                policialLogado, 
+                java.time.LocalDate.now().toString(), 
+                "Delegacia Digital", 
+                boletimCadastrado
+            );
+
+            JOptionPane.showMessageDialog(null, "Status atualizado e registrado no seu histórico!");
+        }
+    }
+        chamarMenuPolicial(); 
+    }
+
+    public static void baterPonto(){
+        JOptionPane.showMessageDialog(
+            null, 
+            "Ponto registrado com sucesso para: " + bancoPoliciais.get(0).getNome() + "\nHorário: " + java.time.LocalTime.now().withNano(0), 
+            "Registro de Ponto", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        chamarMenuPolicial(); 
+    }
+
+    public static void verificarFichaAntecedentes(){
+        chamarMenuPolicial();
+    }
+
+    public static void verificarHistoricoPolicial(){
+        UmPolicial policialLogado = bancoPoliciais.get(0);
+        historicoGeral.listarHistorico(policialLogado);
+    
+        JOptionPane.showMessageDialog(null, 
+            "O histórico detalhado de " + policialLogado.getNome() + 
+            " foi gerado no console do sistema (System.out).", 
+            "Histórico do Policial", 
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        chamarMenuPolicial();
     }
 
     public static void chamarMenuCidadao() {
