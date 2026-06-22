@@ -1,7 +1,7 @@
 // Maressa Luiza dos Reis Machado - 202421901046
 // Carolina Peruare Ferreira - 202412901003
 
-/*  Fazer login como policial: 
+/* Fazer login como policial: 
         2022101
         senhaSegura
 
@@ -22,6 +22,8 @@ import model.UmStatus;
 import java.util.ArrayList;
 import java.util.List;
 import model.UmUsuario; 
+
+import java.awt.Color;
 
 public class Main {
     
@@ -65,9 +67,114 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        
+
+        // Deixar rosa 
+
+        Color corRosa = new Color(248, 200, 220);
+        UIManager.put("OptionPane.background", corRosa);
+        UIManager.put("Panel.background", corRosa);
+
         inicializarSistema();
+        telaInicial(); 
+    }
+    private static ImageIcon carregarLogo() {
+        // Procura o ficheiro dentro da pasta 'src' (classpath)
+        java.net.URL caminhoImagem = Main.class.getResource("/logo.png");
         
+        if (caminhoImagem != null) {
+            return new ImageIcon(caminhoImagem);
+        } else {
+            // Mostra um aviso no terminal caso o ficheiro não esteja no local correto
+            System.out.println("AVISO: O ficheiro 'logo.png' não foi encontrado dentro da pasta 'src'!");
+            return null;
+        }
+    }
+
+    //tela inicial
+    public static void telaInicial() {
+        
+        //carregar logo
+    ImageIcon iconeLogo = carregarLogo(); // Carrega a logo 
+
+        String[] opcoes = {"Fazer Login", "Cadastrar-se", "Sair do Sistema"};
+        
+        int escolha = JOptionPane.showOptionDialog(
+            null,
+            "Bem-vindo ao Sistema de Ocorrências!\nSelecione uma opção abaixo:",
+            "Início",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.PLAIN_MESSAGE, 
+            iconeLogo,                 
+            opcoes,
+            opcoes[0]
+        );
+
+        switch (escolha) {
+            case 0:
+                realizarLogin();
+                break;
+            case 1:
+                realizarCadastro();
+                break;
+            case 2:
+            case -1:
+                JOptionPane.showMessageDialog(null, "Encerrando o sistema. Até logo!");
+                System.exit(0);
+                break;
+        }
+    }
+//cadastro uhu
+    public static void realizarCadastro() {
+        JTextField campoNome = new JTextField();
+        JTextField campoCpf = new JTextField();
+        JTextField campoEmail = new JTextField();
+        JTextField campoDataNasc = new JTextField();
+        JPasswordField campoSenha = new JPasswordField();
+        JTextField campoTelefone = new JTextField();
+
+        Object[] formularioCadastro = {
+            "Nome Completo:", campoNome,
+            "CPF (Apenas números):", campoCpf,
+            "E-mail:", campoEmail,
+            "Data de Nascimento (DD/MM/AAAA):", campoDataNasc,
+            "Senha:", campoSenha,
+            "Telefone (Apenas números):", campoTelefone
+        };
+
+        int resultado = JOptionPane.showConfirmDialog(
+            null, 
+            formularioCadastro, 
+            "Cadastro de Novo Cidadão", 
+            JOptionPane.OK_CANCEL_OPTION
+        );
+
+        if (resultado == JOptionPane.OK_OPTION) {
+            String nome = campoNome.getText();
+            String cpf = campoCpf.getText();
+            String email = campoEmail.getText();
+            String dataNasc = campoDataNasc.getText();
+            String senha = new String(campoSenha.getPassword());
+            String telefone = campoTelefone.getText();
+
+            // Validação simples
+            if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Erro: Nome, E-mail e Senha são obrigatórios!", "Atenção", JOptionPane.WARNING_MESSAGE);
+                realizarCadastro(); // Tenta novamente
+                return;
+            }
+
+            UmUsuario novoUsuario = new UmUsuario(nome, cpf, email, dataNasc, senha, telefone);
+            bancoUsuarios.add(novoUsuario);
+
+            JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso! Você já pode fazer login.");
+        }
+        
+        // Retorna para a tela inicial independentemente de ter cadastrado ou cancelado
+        telaInicial();
+    }
+
+//login
+    public static void realizarLogin() {
         JTextField campoLogin = new JTextField();
         JPasswordField campoSenha = new JPasswordField();
 
@@ -94,7 +201,7 @@ public class Main {
                     autenticado = true;
                     JOptionPane.showMessageDialog(null, "Bem-vinda, " + u.getNome() + "! Acesso liberado.");
                     chamarMenuCidadao();
-                    break;
+                    return; // Sai do método após o menu terminar
                 }
             }
 
@@ -104,7 +211,7 @@ public class Main {
                         autenticado = true;
                         JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
                         chamarMenuPolicial();
-                        break;
+                        return; // Sai do método após o menu terminar
                     }
                 }
             }
@@ -117,7 +224,10 @@ public class Main {
                     "Falha no Login", 
                     JOptionPane.ERROR_MESSAGE
                 );
+                telaInicial(); // Volta para a tela inicial para tentar novamente
             }
+        } else {
+            telaInicial(); // Se o usuário clicar em Cancelar, volta pra tela inicial
         }
     }
 
@@ -162,6 +272,8 @@ public class Main {
             case 5:
             case -1: // Caso o usuário feche a janela no "X"
                 JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
+                usuarioLogado = null; // Limpa o usuário logado
+                telaInicial(); // Volta para a tela inicial
                 break;
         }
     }
@@ -354,6 +466,8 @@ public class Main {
             case 3:
             case -1: // Caso o usuário feche a janela no "X"
                 JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
+                usuarioLogado = null; // Limpa o usuário logado
+                telaInicial(); // Retorna para a tela de login inicial
                 break;
         }
     }
