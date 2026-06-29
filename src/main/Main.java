@@ -1,11 +1,11 @@
 // Maressa Luiza dos Reis Machado - 202421901046
 // Carolina Peruare Ferreira - 202412901003
 
-/* Fazer login como policial: 
+/* Fazer login como policial:
         2022101
         senhaSegura
 
-    Fazer login como cidadão: 
+    Fazer login como cidadão:
         fernanda@cidadao.gov.br
         amoMeuPet
 */
@@ -13,357 +13,593 @@
 package main;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import model.Antecedentes;
 import model.UmaClassificacao;
 import model.UmBoletim;
 import model.UmHistorico;
 import model.UmPolicial;
 import model.UmStatus;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
-import model.UmUsuario; 
-
-import java.awt.Color;
+import model.UmUsuario;
 
 public class Main {
-    
-    private static List<UmUsuario> bancoUsuarios = new ArrayList<>();
-    private static List<UmPolicial> bancoPoliciais = new ArrayList<>();
 
-    private static UmUsuario usuarioLogado = null;
+    // =========================================================================
+    //  CONSTANTES DE ESTILO
+    // =========================================================================
+
+    private static final Color COR_FUNDO        = Color.WHITE; // Fundo branco solicitado
+    private static final Color COR_BOTAO        = new Color(190,  90, 140);
+    private static final Color COR_BOTAO_HOVER  = new Color(160,  60, 110);
+    private static final Color COR_BORDA        = new Color(180, 100, 140);
+    private static final Color COR_TEXTO_BRANCO = Color.WHITE;
+    private static final Font  FONTE_TITULO     = new Font("Segoe UI", Font.BOLD,  18);
+    private static final Font  FONTE_LABEL      = new Font("Segoe UI", Font.BOLD,  13);
+    private static final Font  FONTE_CAMPO      = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font  FONTE_BOTAO      = new Font("Segoe UI", Font.BOLD,  14);
     
-    // Variáveis para salvar o boletim criado em tempo de execução
-    private static UmBoletim boletimCadastrado = null;
-    private static UmStatus statusBoletim = null;
+    // Define o tamanho padronizado para todas as janelas do sistema
+    private static final Dimension TAMANHO_JANELA = new Dimension(500, 600);
+    
+    private static final DateTimeFormatter FMT_DATA =
+            DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
+
+            
+    // =========================================================================
+    //  BANCO DE DADOS EM MEMÓRIA
+    // =========================================================================
+
+    private static final List<UmUsuario>  bancoUsuarios  = new ArrayList<>();
+    private static final List<UmPolicial> bancoPoliciais = new ArrayList<>();
+
+    // =========================================================================
+    //  ESTADO DA SESSÃO
+    // =========================================================================
+
+    private static UmUsuario  usuarioLogado  = null;
+    private static UmPolicial policialLogado = null;
+
+    private static UmBoletim      boletimCadastrado    = null;
+    private static UmStatus        statusBoletim        = null;
     private static UmaClassificacao classificacaoBoletim = null;
-    private static UmHistorico historicoGeral = new UmHistorico(java.time.LocalDate.now().toString());
-    private static int entradaOuSaida = 0; // 0 para entrada, 1 para saída
+    private static UmHistorico historicoGeral =
+            new UmHistorico(LocalDate.now().toString());
+    private static int entradaOuSaida = 0; // 0 = entrada, 1 = saída
 
-    // Inicializa o sistema com os usuários cadastrados
+    // =========================================================================
+    //  INICIALIZAÇÃO
+    // =========================================================================
+
     public static void inicializarSistema() {
-       UmPolicial policial = new UmPolicial(
-            "Flores Machado dos Santos", // nome
-            "12345678901",           // cpf
-            "flores@policia.gov.br",     // email
-            "15/08/1985",                // data_Nasc
-            "senhaSegura",               // senha
-            "65998775341",               // telefone
-            "2022101",                   // matricula
-            "Sargenta",                  // patente
-            false,                       // em_servico
-            false                        // autenticado
+        UmPolicial policial = new UmPolicial(
+            "Flores Machado dos Santos",
+            "12345678901",
+            "flores@policia.gov.br",
+            "15/08/1985",
+            "senhaSegura",
+            "65998775341",
+            "2022101",
+            "Sargenta",
+            false,
+            false
         );
         bancoPoliciais.add(policial);
 
         UmUsuario usuario = new UmUsuario(
-            "Fernanda Maria Ferreira",   // nome
-            "99988877766",            // cpf
-            "fernanda@cidadao.gov.br",   // email
-            "24/02/2001",                // data_Nasc
-            "amoMeuPet",                 // senha
-            "65998775341"                // telefone
+            "Fernanda Maria Ferreira",
+            "99988877766",
+            "fernanda@cidadao.gov.br",
+            "24/02/2001",
+            "amoMeuPet",
+            "65998775341"
         );
         bancoUsuarios.add(usuario);
     }
 
     public static void main(String[] args) {
-
-        // Deixar rosa 
-
-        Color corRosa = new Color(248, 200, 220);
-        UIManager.put("OptionPane.background", corRosa);
-        UIManager.put("Panel.background", corRosa);
-
+        aplicarTemaGlobal();
         inicializarSistema();
-        telaInicial(); 
-    }
-    private static ImageIcon carregarLogo() {
-        // Procura o ficheiro dentro da pasta 'src' (classpath)
-        java.net.URL caminhoImagem = Main.class.getResource("/logo.png");
-        
-        if (caminhoImagem != null) {
-            return new ImageIcon(caminhoImagem);
-        } else {
-            // Mostra um aviso no terminal caso o ficheiro não esteja no local correto
-            System.out.println("AVISO: O ficheiro 'logo.png' não foi encontrado dentro da pasta 'src'!");
-            return null;
-        }
-    }
-
-    //tela inicial
-    public static void telaInicial() {
-        
-        //carregar logo
-    ImageIcon iconeLogo = carregarLogo(); // Carrega a logo 
-
-        String[] opcoes = {"Fazer Login", "Cadastrar-se", "Sair do Sistema"};
-        
-        int escolha = JOptionPane.showOptionDialog(
-            null,
-            "Bem-vindo ao Sistema de Ocorrências!\nSelecione uma opção abaixo:",
-            "Início",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.PLAIN_MESSAGE, 
-            iconeLogo,                 
-            opcoes,
-            opcoes[0]
-        );
-
-        switch (escolha) {
-            case 0:
-                realizarLogin();
-                break;
-            case 1:
-                realizarCadastro();
-                break;
-            case 2:
-            case -1:
-                JOptionPane.showMessageDialog(null, "Encerrando o sistema. Até logo!");
-                System.exit(0);
-                break;
-        }
-    }
-//cadastro uhu
-    public static void realizarCadastro() {
-        JTextField campoNome = new JTextField();
-        JTextField campoCpf = new JTextField();
-        JTextField campoEmail = new JTextField();
-        JTextField campoDataNasc = new JTextField();
-        JPasswordField campoSenha = new JPasswordField();
-        JTextField campoTelefone = new JTextField();
-
-        Object[] formularioCadastro = {
-            "Nome Completo:", campoNome,
-            "CPF (Apenas números):", campoCpf,
-            "E-mail:", campoEmail,
-            "Data de Nascimento (DD/MM/AAAA):", campoDataNasc,
-            "Senha:", campoSenha,
-            "Telefone (Apenas números):", campoTelefone
-        };
-
-        int resultado = JOptionPane.showConfirmDialog(
-            null, 
-            formularioCadastro, 
-            "Cadastro de Novo Cidadão", 
-            JOptionPane.OK_CANCEL_OPTION
-        );
-
-        if (resultado == JOptionPane.OK_OPTION) {
-            String nome = campoNome.getText();
-            String cpf = campoCpf.getText();
-            String email = campoEmail.getText();
-            String dataNasc = campoDataNasc.getText();
-            String senha = new String(campoSenha.getPassword());
-            String telefone = campoTelefone.getText();
-
-            // Validação simples
-            if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Erro: Nome, E-mail e Senha são obrigatórios!", "Atenção", JOptionPane.WARNING_MESSAGE);
-                realizarCadastro(); // Tenta novamente
-                return;
-            }
-
-            UmUsuario novoUsuario = new UmUsuario(nome, cpf, email, dataNasc, senha, telefone);
-            bancoUsuarios.add(novoUsuario);
-
-            JOptionPane.showMessageDialog(null, "Cadastro realizado com sucesso! Você já pode fazer login.");
-        }
-        
-        // Retorna para a tela inicial independentemente de ter cadastrado ou cancelado
         telaInicial();
     }
 
-//login
-    public static void realizarLogin() {
-        JTextField campoLogin = new JTextField();
-        JPasswordField campoSenha = new JPasswordField();
+    // =========================================================================
+    //  TEMA VISUAL GLOBAL
+    // =========================================================================
 
-        Object[] camposLogin = {
-            "Login (E-mail para Cidadão ou Matrícula para Policial):", campoLogin,
-            "Senha:", campoSenha
-        };
+    private static void aplicarTemaGlobal() {
+        UIManager.put("OptionPane.background",       COR_FUNDO);
+        UIManager.put("Panel.background",            COR_FUNDO);
+        UIManager.put("Button.background",           COR_BOTAO);
+        UIManager.put("Button.foreground",           COR_TEXTO_BRANCO);
+        UIManager.put("Button.font",                 FONTE_BOTAO);
+        UIManager.put("Label.font",                  FONTE_LABEL);
+        UIManager.put("TextField.font",              FONTE_CAMPO);
+        UIManager.put("PasswordField.font",          FONTE_CAMPO);
+        UIManager.put("ComboBox.font",               FONTE_CAMPO);
+        UIManager.put("TextArea.font",               FONTE_CAMPO);
+        UIManager.put("OptionPane.messageFont",      FONTE_LABEL);
+        UIManager.put("OptionPane.buttonFont",       FONTE_BOTAO);
+        UIManager.put("Button.border", BorderFactory.createEmptyBorder(8, 15, 8, 15));
+    }
 
-        int opcaoLogin = JOptionPane.showConfirmDialog(
-            null, 
-            camposLogin, 
-            "Login do Sistema de Ocorrências", 
-            JOptionPane.OK_CANCEL_OPTION
+    // =========================================================================
+    //  HELPERS DE UI
+    // =========================================================================
+
+    /** Carrega e redimensiona a logo para o Header. */
+    private static ImageIcon carregarLogo() {
+        java.net.URL url = Main.class.getResource("/logo.png");
+        if (url != null) {
+            ImageIcon icon = new ImageIcon(url);
+            // Redimensiona para caber bonito no header
+            Image img = icon.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+        System.out.println("AVISO: 'logo.png' não encontrado dentro de 'src'.");
+        return null;
+    }
+
+    /** Carrega a imagem original para ser usada como ícone da janela */
+    private static Image carregarIconeJanela() {
+        java.net.URL url = Main.class.getResource("/logo.png");
+        if (url != null) {
+            return new ImageIcon(url).getImage();
+        }
+        return null;
+    }
+
+    /** Cria o Header padrão que aparecerá em todas as telas. */
+    private static JPanel criarCabecalho() {
+        JPanel painelHeader = new JPanel(new BorderLayout(15, 0));
+        painelHeader.setBackground(COR_FUNDO);
+        painelHeader.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 2, 0, COR_BORDA), // Linha sutil embaixo
+            new EmptyBorder(10, 20, 10, 20)
+        ));
+
+        ImageIcon logo = carregarLogo();
+        if (logo != null) {
+            painelHeader.add(new JLabel(logo), BorderLayout.WEST);
+        }
+
+        JLabel lblTitulo = new JLabel("Fork's Women Police Departament");
+        lblTitulo.setFont(FONTE_TITULO);
+        lblTitulo.setForeground(COR_BOTAO); // Título na cor do tema
+        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+
+        painelHeader.add(lblTitulo, BorderLayout.CENTER);
+
+        return painelHeader;
+    }
+
+    private static JTextField campoCriado() {
+        JTextField c = new JTextField(22);
+        c.setFont(FONTE_CAMPO);
+        c.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COR_BORDA, 1, true),
+            BorderFactory.createEmptyBorder(6, 8, 6, 8) // Mais padding interno
+        ));
+        return c;
+    }
+
+    private static JPasswordField campaSenha() {
+        JPasswordField c = new JPasswordField(22);
+        c.setFont(FONTE_CAMPO);
+        c.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(COR_BORDA, 1, true),
+            BorderFactory.createEmptyBorder(6, 8, 6, 8)
+        ));
+        return c;
+    }
+
+    private static JLabel labelCriado(String texto) {
+        JLabel l = new JLabel(texto);
+        l.setFont(FONTE_LABEL);
+        return l;
+    }
+
+    /** Monta apenas a grade de campos. */
+    private static JPanel criarPainelForm(Object... pares) {
+        JPanel painel = new JPanel(new GridLayout(0, 1, 4, 8)); // Maior espaçamento vertical
+        painel.setBackground(COR_FUNDO);
+        
+        for (Object item : pares) {
+            if (item instanceof String) {
+                painel.add(labelCriado((String) item));
+            } else if (item instanceof Component) {
+                painel.add((Component) item);
+            }
+        }
+        return painel;
+    }
+
+    private static int exibirFormulario(String tituloJanela, JPanel campos) {
+        JPanel painelPrincipal = new JPanel(new BorderLayout());
+        painelPrincipal.setBackground(COR_FUNDO);
+        painelPrincipal.setPreferredSize(TAMANHO_JANELA); 
+
+        painelPrincipal.add(criarCabecalho(), BorderLayout.NORTH);
+
+        JPanel centro = new JPanel(new BorderLayout());
+        centro.setBackground(COR_FUNDO);
+        
+        // AQUI: Reduzimos as margens (Top: 5, Left: 40, Bottom: 5, Right: 40)
+        centro.setBorder(new EmptyBorder(5, 40, 5, 40)); 
+        centro.add(campos, BorderLayout.NORTH);
+
+        painelPrincipal.add(centro, BorderLayout.CENTER);
+
+        return JOptionPane.showConfirmDialog(
+            null, painelPrincipal, tituloJanela, 
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+        );
+    }
+
+    /** Exibe o Menu Principal padronizado com tamanho fixo. */
+    private static int exibirMenu(String titulo, String cabecalhoSecundario, String[] opcoes) {
+        final int[] resultado = {-1};
+
+        JFrame frame = new JFrame(titulo);
+
+        Image icone = carregarIconeJanela();
+        if (icone != null) {
+            frame.setIconImage(icone);
+        }
+
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(TAMANHO_JANELA); // Tamanho fixo para TODAS as janelas
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+        frame.setLayout(new BorderLayout());
+        frame.getContentPane().setBackground(COR_FUNDO);
+
+        // Adiciona o Header Global
+        frame.add(criarCabecalho(), BorderLayout.NORTH);
+
+        // Conteúdo central
+        JPanel conteudo = new JPanel(new BorderLayout(0, 20));
+        conteudo.setBackground(COR_FUNDO);
+        conteudo.setBorder(new EmptyBorder(20, 50, 40, 50));
+
+        // Subtítulo do menu (ex: Painel do Cidadão)
+        JLabel lblCabecalho = new JLabel("<html><center>" +
+                cabecalhoSecundario.replace("\n", "<br>") + "</center></html>");
+        lblCabecalho.setFont(FONTE_LABEL);
+        lblCabecalho.setHorizontalAlignment(SwingConstants.CENTER);
+        conteudo.add(lblCabecalho, BorderLayout.NORTH);
+
+        // Botões bonitos centralizados
+        JPanel painelBotoes = new JPanel(new GridLayout(opcoes.length, 1, 0, 12));
+        painelBotoes.setBackground(COR_FUNDO);
+
+        for (int i = 0; i < opcoes.length; i++) {
+            final int idx = i;
+            JButton btn = new JButton(opcoes[i]);
+            btn.setFont(FONTE_BOTAO);
+            btn.setBackground(COR_BOTAO);
+            btn.setForeground(COR_TEXTO_BRANCO);
+            btn.setFocusPainted(false);
+            btn.setPreferredSize(new Dimension(300, 45)); // Botões mais grossos e bonitos
+            btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent e) { btn.setBackground(COR_BOTAO_HOVER); }
+                public void mouseExited(java.awt.event.MouseEvent e) { btn.setBackground(COR_BOTAO); }
+            });
+
+            btn.addActionListener(e -> {
+                resultado[0] = idx;
+                frame.dispose();
+            });
+            painelBotoes.add(btn);
+        }
+
+        // Centraliza a grid de botões
+        JPanel wrapBotoes = new JPanel(new GridBagLayout());
+        wrapBotoes.setBackground(COR_FUNDO);
+        wrapBotoes.add(painelBotoes);
+        
+        conteudo.add(wrapBotoes, BorderLayout.CENTER);
+        frame.add(conteudo, BorderLayout.CENTER);
+
+        // Bloqueia até o frame fechar
+        Object lock = new Object();
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                synchronized (lock) { lock.notifyAll(); }
+            }
+        });
+        
+        frame.setVisible(true);
+        synchronized (lock) {
+            while (frame.isVisible()) {
+                try { lock.wait(); } catch (InterruptedException ignored) {}
+            }
+        }
+
+        return resultado[0];
+    }
+
+    private static void erro(String msg, String titulo) {
+        JOptionPane.showMessageDialog(null, msg, titulo, JOptionPane.ERROR_MESSAGE);
+    }
+    private static void aviso(String msg, String titulo) {
+        JOptionPane.showMessageDialog(null, msg, titulo, JOptionPane.WARNING_MESSAGE);
+    }
+    private static void sucesso(String msg) {
+        JOptionPane.showMessageDialog(null, msg, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    }
+    private static void info(String msg, String titulo) {
+        JOptionPane.showMessageDialog(null, msg, titulo, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // =========================================================================
+    //  VALIDAÇÃO DE DATA
+    // =========================================================================
+
+    private static boolean isDataValida(String data) {
+        if (data == null || data.isEmpty()) return false;
+        try {
+            LocalDate.parse(data, FMT_DATA);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    private static LocalDate parseData(String data) {
+        return LocalDate.parse(data, FMT_DATA);
+    }
+
+    // =========================================================================
+    //  TELA INICIAL
+    // =========================================================================
+
+    public static void telaInicial() {
+        String[] opcoes = {"Fazer Login", "Cadastrar-se", "Sair do Sistema"};
+
+        // Agora a tela inicial também usa o Menu padronizado
+        int escolha = exibirMenu(
+            "Início", 
+            "Bem-vindo ao Sistema de Ocorrências!\nSelecione uma opção abaixo:", 
+            opcoes
         );
 
-        if (opcaoLogin == JOptionPane.OK_OPTION) {
-            String loginDigitado = campoLogin.getText();
-            String senhaDigitada = new String(campoSenha.getPassword());
-            boolean autenticado = false;
+        switch (escolha) {
+            case 0:  realizarLogin();    break;
+            case 1:  realizarCadastro(); break;
+            default:
+                JOptionPane.showMessageDialog(null, "Encerrando o sistema. Até logo!");
+                System.exit(0);
+        }
+    }
+
+    // =========================================================================
+    //  CADASTRO DE CIDADÃO
+    // =========================================================================
+
+    public static void realizarCadastro() {
+        while (true) {
+            JTextField campoNome     = campoCriado();
+            JTextField campoCpf      = campoCriado();
+            JTextField campoEmail    = campoCriado();
+            JTextField campoDataNasc = campoCriado();
+            JPasswordField campoSenha = campaSenha();
+            JTextField campoTelefone = campoCriado();
+
+            JPanel form = criarPainelForm(
+                "Nome Completo:",                 campoNome,
+                "CPF (apenas números):",          campoCpf,
+                "E-mail:",                        campoEmail,
+                "Data Nasc. (DD/MM/AAAA):",       campoDataNasc,
+                "Senha:",                         campoSenha,
+                "Telefone (apenas números):",     campoTelefone
+            );
+
+            // Usa o novo helper padronizado
+            int resultado = exibirFormulario("Cadastro de Novo Cidadão", form);
+
+            if (resultado != JOptionPane.OK_OPTION) break;
+
+            String nome     = campoNome.getText().trim();
+            String cpf      = campoCpf.getText().trim();
+            String email    = campoEmail.getText().trim();
+            String dataNasc = campoDataNasc.getText().trim();
+            String senha    = new String(campoSenha.getPassword()).trim();
+            String telefone = campoTelefone.getText().trim();
+
+            if (nome.isEmpty() || cpf.isEmpty() || email.isEmpty() || dataNasc.isEmpty() || senha.isEmpty() || telefone.isEmpty()) {
+                aviso("Todos os campos são obrigatórios!", "Campo Obrigatório");
+                continue;
+            }
+            if (!email.contains("@") || !email.contains(".")) {
+                erro("O e-mail informado é inválido!", "E-mail Inválido");
+                continue;
+            }
+            if (!isDataValida(dataNasc) || parseData(dataNasc).isAfter(LocalDate.now())) {
+                erro("A data de nascimento é inválida ou futura!", "Data Inválida");
+                continue;
+            }
+            if (!cpf.matches("\\d{11}")) {
+                erro("O CPF deve conter exatamente 11 dígitos numéricos!", "CPF Inválido");
+                continue;
+            }
+            if (!telefone.matches("\\d+") || telefone.length() < 10 || telefone.length() > 11) {
+                erro("Telefone inválido!", "Telefone Inválido");
+                continue;
+            }
+
+            boolean duplicado = false;
+            for (UmUsuario u : bancoUsuarios) {
+                if (u.getEmail().equalsIgnoreCase(email) || u.getCpf().equals(cpf)) {
+                    erro("Usuário já cadastrado com este E-mail ou CPF!", "Dados Duplicados");
+                    duplicado = true;
+                    break;
+                }
+            }
+            if (duplicado) continue;
+
+            bancoUsuarios.add(new UmUsuario(nome, cpf, email, dataNasc, senha, telefone));
+            sucesso("Cadastro realizado com sucesso!\nVocê já pode fazer login.");
+            break; 
+        }
+        telaInicial();
+    }
+
+    // =========================================================================
+    //  LOGIN
+    // =========================================================================
+
+    public static void realizarLogin() {
+        while (true) {
+            JTextField campoLogin = campoCriado();
+            JPasswordField campoSenha = campaSenha();
+
+            JPanel form = criarPainelForm(
+                "Login (E-mail para Cidadão ou Matrícula para Policial):", campoLogin,
+                "Senha:", campoSenha
+            );
+
+            JPanel painel = new JPanel(new GridLayout(0, 1, 4, 4)); 
+            painel.setBackground(COR_FUNDO); 
+
+            // Usa o novo helper padronizado
+            int opcao = exibirFormulario("Login — Sistema de Ocorrências", form);
+
+            if (opcao != JOptionPane.OK_OPTION) {
+                telaInicial();
+                return;
+            }
+
+            String login = campoLogin.getText().trim();
+            String senha = new String(campoSenha.getPassword()).trim();
+
+            if (login.isEmpty() || senha.isEmpty()) {
+                aviso("Os campos de login e senha não podem estar vazios!", "Atenção");
+                continue;
+            }
+
+            boolean encontrado  = false;
+            boolean senhaErrada = false;
 
             for (UmUsuario u : bancoUsuarios) {
-                if (u.getEmail().equals(loginDigitado) && u.getSenha().equals(senhaDigitada)) {
-                    usuarioLogado = u; // Salva quem está usando o sistema
-                    autenticado = true;
-                    JOptionPane.showMessageDialog(null, "Bem-vinda, " + u.getNome() + "! Acesso liberado.");
-                    chamarMenuCidadao();
-                    return; // Sai do método após o menu terminar
+                if (u.getEmail().equalsIgnoreCase(login)) {
+                    encontrado = true;
+                    if (u.getSenha().equals(senha)) {
+                        usuarioLogado = u;
+                        info("Bem-vinda, " + u.getNome() + "!\nAcesso liberado.", "Acesso Permitido");
+                        chamarMenuCidadao();
+                        return;
+                    } else {
+                        senhaErrada = true;
+                    }
+                    break;
                 }
             }
 
-            if (!autenticado) {
+            if (!encontrado || senhaErrada) {
                 for (UmPolicial p : bancoPoliciais) {
-                    if (p.getMatricula().equals(loginDigitado) && p.getSenha().equals(senhaDigitada)) {
-                        autenticado = true;
-                        JOptionPane.showMessageDialog(null, "Acesso Oficial detectado: " + p.getNome() + "\n(Redirecionando para a área do Policial...)");
-                        chamarMenuPolicial();
-                        return; // Sai do método após o menu terminar
+                    if (p.getMatricula().equals(login)) {
+                        encontrado = true;
+                        if (p.getSenha().equals(senha)) {
+                            policialLogado = p; 
+                            info("Acesso Oficial: " + p.getNome() + "\nRedirecionando...", "Acesso Policial");
+                            chamarMenuPolicial();
+                            return;
+                        } else {
+                            senhaErrada = true;
+                        }
+                        break;
                     }
                 }
             }
 
-            // Se não achou em nenhuma das listas, erro
-            if (!autenticado) {
-                JOptionPane.showMessageDialog(
-                    null, 
-                    "Erro: E-mail/Matrícula ou senha incorretos, ou usuário não cadastrado.", 
-                    "Falha no Login", 
-                    JOptionPane.ERROR_MESSAGE
-                );
-                telaInicial(); // Volta para a tela inicial para tentar novamente
-            }
-        } else {
-            telaInicial(); // Se o usuário clicar em Cancelar, volta pra tela inicial
+            if (!encontrado) erro("E-mail ou Matrícula não encontrados.", "Usuário Inexistente");
+            else if (senhaErrada) erro("Senha incorreta.", "Falha de Autenticação");
         }
     }
 
-    public static void chamarMenuPolicial(){
+    // =========================================================================
+    //  MENU DO POLICIAL
+    // =========================================================================
 
-        String [] botoesMenuPolicial = {
-            "Consultar Boletins", 
-            "Atualizar Status de Ocorrência", 
+    public static void chamarMenuPolicial() {
+        String[] opcoes = {
+            "Consultar Boletins",
+            "Atualizar Status de Ocorrência",
             "Bater Ponto",
             "Verificar Ficha de Antecedentes",
             "Meu Histórico",
             "Sair"
         };
 
-        int op = JOptionPane.showOptionDialog(
-            null,
-            "=== PAINEL DO POLICIAL ===\nUsuário logado: " + bancoPoliciais.get(0).getNome() + "\n\nSelecione a ação desejada abaixo:",
-            "Menu Principal",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            botoesMenuPolicial,
-            botoesMenuPolicial[0] 
-        );
-
-        switch(op) {
-            case 0:
-                consultarBoletim();
-                break;
-            case 1:
-                atualizarOcorrencia();
-                break;
-            case 2:
-                baterPonto();
-                break;
-            case 3:
-                verificarFichaAntecedentes();
-                break;
-            case 4:
-                verificarHistoricoPolicial();
-                break;
-            case 5:
-            case -1: // Caso o usuário feche a janela no "X"
-                JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
-                usuarioLogado = null; // Limpa o usuário logado
-                telaInicial(); // Volta para a tela inicial
-                break;
-        }
-    }
-
-    public static void consultarBoletim(){
-        if (boletimCadastrado == null){
-            JOptionPane.showMessageDialog(
-                null, 
-                "Nenhum boletim registrado nesta sessão.\nPor favor, peça para o cidadão registrar uma ocorrência primeiro.", 
-                "Nenhum Registro Encontrado", 
-                JOptionPane.WARNING_MESSAGE
+        while (true) {
+            int op = exibirMenu(
+                "Painel do Policial",
+                "=== PAINEL DO POLICIAL ===\nOficial: " + policialLogado.getNome(),
+                opcoes
             );
-        } else {
-            String relatorio = "=== CONSULTA DE BOLETIM ===\n\n" +
-                               "Buscando registros vinculados ao usuário: " + usuarioLogado.getNome() + "\n\n" +
-                               "• Classificação Atribuída: " + classificacaoBoletim.getTipoClassificacao() + "\n" +
-                               "• Status do Processo: " + statusBoletim.getTipo() + "\n\n" +
-                               "Detalhamento do Sistema: O caso foi registrado e aguarda análise.";
-            
-            JOptionPane.showMessageDialog(null, relatorio, "Acompanhamento de Ocorrência", JOptionPane.INFORMATION_MESSAGE);
-            
-            System.out.println("\n-> [POO VALIDAÇÃO] Policial consultou o boletim registrado:");
-            statusBoletim.identificarStatus();
+
+            switch (op) {
+                case 0:  consultarBoletim();           break;
+                case 1:  atualizarOcorrencia();        break;
+                case 2:  baterPonto();                 break;
+                case 3:  verificarFichaAntecedentes(); break;
+                case 4:  verificarHistoricoPolicial(); break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
+                    policialLogado = null;
+                    telaInicial();
+                    return;
+            }
         }
-        chamarMenuPolicial(); 
     }
 
-    public static void atualizarOcorrencia(){
+    public static void consultarBoletim() {
+        if (boletimCadastrado == null) {
+            aviso("Nenhum boletim registrado nesta sessão.", "Nenhum Registro");
+            return;
+        }
+        String relatorio = "=== CONSULTA DE BOLETIM ===\n\nConsultado pelo oficial: " + policialLogado.getNome() + "\n\n"
+            + "• Classificação Atribuída: " + classificacaoBoletim.getTipoClassificacao() + "\n"
+            + "• Status do Processo:      " + statusBoletim.getTipo() + "\n\nO caso foi registrado e aguarda análise.";
+        info(relatorio, "Acompanhamento de Ocorrência");
+    }
+
+    public static void atualizarOcorrencia() {
         if (boletimCadastrado == null || statusBoletim == null) {
-            JOptionPane.showMessageDialog(
-                null, 
-                "Nenhum boletim registrado nesta sessão para atualizar.\nPor favor, peça para o cidadão registrar uma ocorrência primeiro.", 
-                "Nenhum Registro Encontrado", 
-                JOptionPane.WARNING_MESSAGE
-            );
-        } else {
-            String[] opcoesStatus = {"Em Análise", "Em Andamento", "Concluído"};
-            String novoStatus = (String) JOptionPane.showInputDialog(
-                null,
-                "Selecione o novo status para o boletim de número: " + boletimCadastrado.getId(),
-                "Atualização de Status",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                opcoesStatus,
-                opcoesStatus[0]
-            );
+            aviso("Nenhum boletim registrado nesta sessão.", "Nenhum Registro");
+            return;
+        }
+        String[] opcoesStatus = {"Em Análise", "Em Andamento", "Concluído"};
+        String novoStatus = (String) JOptionPane.showInputDialog(null, "Selecione o novo status:", 
+            "Atualização", JOptionPane.QUESTION_MESSAGE, null, opcoesStatus, opcoesStatus[0]);
 
-            if (novoStatus != null) {
+        if (novoStatus != null) {
             statusBoletim = new UmStatus(novoStatus.toLowerCase());
             boletimCadastrado.atualizarStatus(statusBoletim);
-
-            // Registra essa atualização no histórico do policial logado
-            UmPolicial policialLogado = bancoPoliciais.get(0);
-            historicoGeral.registrarAtendimentoOcorrencia(
-                "Atualização de status para: " + novoStatus, 
-                policialLogado, 
-                java.time.LocalDate.now().toString(), 
-                "Delegacia Digital", 
-                boletimCadastrado
-            );
-
-            JOptionPane.showMessageDialog(null, "Status atualizado e registrado no seu histórico!");
+            historicoGeral.registrarAtendimentoOcorrencia("Atualização de status: " + novoStatus, policialLogado,
+                LocalDate.now().toString(), "Delegacia Digital", boletimCadastrado);
+            sucesso("Status atualizado com sucesso!");
         }
-    }
-        chamarMenuPolicial(); 
     }
 
     public static void baterPonto() {
-        UmPolicial policialLogado = bancoPoliciais.get(0);
-
-        if(entradaOuSaida == 0) {
-            historicoGeral.registrarEventoSimples(policialLogado, "REGISTRO DE PONTO (ENTRADA)");
-            entradaOuSaida = 1; // Próxima vez será saída
-        } else {
-            historicoGeral.registrarEventoSimples(policialLogado, "REGISTRO DE PONTO (SAÍDA)");
-            entradaOuSaida = 0; // Próxima vez será entrada
-        }
-
-        JOptionPane.showMessageDialog(
-            null, 
-            "Ponto registrado com sucesso!\nPolicial: " + policialLogado.getNome(), 
-            "Ponto Eletrônico", 
-            JOptionPane.INFORMATION_MESSAGE
-        );
-
-        chamarMenuPolicial(); 
+        String tipo = (entradaOuSaida == 0) ? "REGISTRO DE PONTO (ENTRADA)" : "REGISTRO DE PONTO (SAÍDA)";
+        historicoGeral.registrarEventoSimples(policialLogado, tipo);
+        entradaOuSaida = (entradaOuSaida == 0) ? 1 : 0;
+        info("Ponto registrado com sucesso!", "Ponto Eletrônico");
     }
 
     public static void verificarFichaAntecedentes() {
-        String cpfBusca = JOptionPane.showInputDialog("Digite o CPF do cidadão (apenas números):");
+        String cpfBusca = JOptionPane.showInputDialog(null, "Digite o CPF do cidadão (apenas números):", "Buscar Ficha", JOptionPane.QUESTION_MESSAGE);
         UmUsuario alvo = null;
 
         if (cpfBusca != null && !cpfBusca.isEmpty()) {
@@ -378,39 +614,157 @@ public class Main {
                 UmPolicial policialLogado = bancoPoliciais.get(0);
                 Antecedentes ficha = new Antecedentes(0, false, 101, "N/A", "Nada consta");
                 
-                String mensagem = "=== FICHA CRIMINAL ===\n" +
-                                  "Cidadão: " + alvo.getNome() + "\n" +
-                                  "Status: " + (ficha.isPossuiAntecedentes() ? "POSSUI PASSAGENS" : "NADA CONSTA") + "\n" +
-                                  "Quantidade: " + ficha.getQuantidadeAntecedentes() + "\n" +
-                                  "Última Ocorrência: " + ficha.getDataUltimaOcorrencia() + "\n" +
-                                  "Observações: " + ficha.getObservacoesAntecedentes();
+                // 1. Painel principal (fundo branco)
+                JPanel painelPrincipal = new JPanel();
+                painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+                painelPrincipal.setBackground(java.awt.Color.WHITE);
+                painelPrincipal.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new java.awt.Color(200, 200, 200), 1),
+                    BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                ));
 
-                JOptionPane.showMessageDialog(null, mensagem);
+                // 2. Título
+                JLabel lblTitulo = new JLabel("FICHA CRIMINAL");
+                lblTitulo.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
+                lblTitulo.setForeground(new java.awt.Color(136, 14, 79)); 
+                lblTitulo.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+
+                JSeparator separador = new JSeparator();
+                separador.setForeground(new java.awt.Color(244, 143, 177));
+                separador.setMaximumSize(new java.awt.Dimension(400, 5));
+
+                // 3. Dados do cidadão (alinhados à esquerda)
+                JPanel painelDados = new JPanel();
+                painelDados.setLayout(new BoxLayout(painelDados, BoxLayout.Y_AXIS));
+                painelDados.setBackground(java.awt.Color.WHITE);
+                painelDados.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                painelDados.setMaximumSize(new java.awt.Dimension(400, 80)); 
+
+                JLabel lblSub = new JLabel("Dados do Cidadão:");
+                lblSub.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+                
+                JLabel lblNome = new JLabel("Nome: " + alvo.getNome());
+                lblNome.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+                
+                JLabel lblCpf = new JLabel("CPF: " + alvo.getCpf());
+                lblCpf.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+
+                painelDados.add(lblSub);
+                painelDados.add(Box.createVerticalStrut(5));
+                painelDados.add(lblNome);
+                painelDados.add(lblCpf);
+
+                // 4. Caixa de Status (Muda de cor dependendo dos antecedentes)
+                JPanel painelStatus = new JPanel();
+                painelStatus.setLayout(new BoxLayout(painelStatus, BoxLayout.Y_AXIS));
+                painelStatus.setBackground(new java.awt.Color(245, 245, 245));
+                
+                boolean possuiPassagens = ficha.isPossuiAntecedentes();
+                // Verde se estiver limpo, Vermelho se tiver passagem
+                java.awt.Color corBorda = possuiPassagens ? new java.awt.Color(211, 47, 47) : new java.awt.Color(76, 175, 80); 
+                java.awt.Color corTexto = possuiPassagens ? new java.awt.Color(198, 40, 40) : new java.awt.Color(46, 125, 50);
+
+                painelStatus.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 5, 0, 0, corBorda), 
+                    BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                ));
+                painelStatus.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+                painelStatus.setMaximumSize(new java.awt.Dimension(400, 110));
+
+                JLabel lblStatus = new JLabel("Status: " + (possuiPassagens ? "POSSUI PASSAGENS" : "NADA CONSTA"));
+                lblStatus.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16));
+                lblStatus.setForeground(corTexto);
+                
+                JLabel lblQtd = new JLabel("Quantidade de registros: " + ficha.getQuantidadeAntecedentes());
+                lblQtd.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 13));
+                
+                JLabel lblUltima = new JLabel("Última Ocorrência: " + ficha.getDataUltimaOcorrencia());
+                lblUltima.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 13));
+                
+                JLabel lblObs = new JLabel("Observações: " + ficha.getObservacoesAntecedentes());
+                lblObs.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 13));
+
+                painelStatus.add(lblStatus);
+                painelStatus.add(Box.createVerticalStrut(8));
+                painelStatus.add(lblQtd);
+                painelStatus.add(lblUltima);
+                painelStatus.add(lblObs);
+
+                // 5. Montagem do painel de conteúdo
+                painelPrincipal.add(lblTitulo);
+                painelPrincipal.add(Box.createVerticalStrut(15));
+                painelPrincipal.add(separador);
+                painelPrincipal.add(Box.createVerticalStrut(20));
+                painelPrincipal.add(painelDados);
+                painelPrincipal.add(Box.createVerticalStrut(20));
+                painelPrincipal.add(painelStatus);
+                painelPrincipal.add(Box.createVerticalGlue()); // Empurra o conteúdo para cima
+
+                // 6. Fundo rosa (Tamanho Fixo 500x600 para manter o padrão)
+                JPanel painelFundo = new JPanel(new java.awt.BorderLayout());
+                painelFundo.setBackground(new java.awt.Color(248, 200, 220));
+                painelFundo.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                painelFundo.setPreferredSize(new java.awt.Dimension(500, 600)); 
+                painelFundo.add(painelPrincipal, java.awt.BorderLayout.CENTER);
+
+                // 7. Exibição da janela limpa (sem o "i" de informação)
+                JOptionPane.showOptionDialog(
+                    null, painelFundo, "Consulta de Ficha Criminal", 
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, 
+                    null, new Object[]{"Voltar"}, "Voltar"
+                );
                 
                 // Logs de validação
                 ficha.listarOcorrencia(); 
                 historicoGeral.registrarEventoSimples(policialLogado, "Consulta de Antecedentes: " + alvo.getNome());
             } else {
-                JOptionPane.showMessageDialog(null, "CPF não encontrado no sistema.");
+                JOptionPane.showMessageDialog(null, "CPF não encontrado no sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
             }
         }
         
         chamarMenuPolicial();
     }
-        
 
-    public static void verificarHistoricoPolicial(){
+    public static void verificarHistoricoPolicial() {
         UmPolicial policialLogado = bancoPoliciais.get(0);
-    
+
+        // 1. Painel principal
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBackground(Color.WHITE);
+        painelPrincipal.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+
+        // 2. Título
+        JLabel lblTitulo = new JLabel("HISTÓRICO DE ATIVIDADES");
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(136, 14, 79)); 
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JSeparator separador = new JSeparator();
+        separador.setForeground(new Color(244, 143, 177));
+        separador.setMaximumSize(new java.awt.Dimension(400, 5));
+
+        // 3. Subtítulo com o nome do oficial
+        JPanel painelDados = new JPanel();
+        painelDados.setLayout(new BoxLayout(painelDados, BoxLayout.Y_AXIS));
+        painelDados.setBackground(Color.WHITE);
+        painelDados.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelDados.setMaximumSize(new java.awt.Dimension(400, 40)); 
+
+        JLabel lblNome = new JLabel("Oficial: " + policialLogado.getNome());
+        lblNome.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        painelDados.add(lblNome);
+
+        // 4. Monta o texto do histórico
         StringBuilder relatorioHistorial = new StringBuilder();
-        relatorioHistorial.append("=== HISTÓRICO DE ATIVIDADES ===\n");
-        relatorioHistorial.append("Oficial: ").append(policialLogado.getNome()).append("\n");
-        relatorioHistorial.append("--------------------------------------------------\n\n");
         boolean encontrouRegistros = false;
 
         for(String operacao : historicoGeral.getListaOperacoes()) {
             if (operacao.contains(policialLogado.getNome())) {
-                relatorioHistorial.append("-> ").append(operacao).append("\n");
+                relatorioHistorial.append("➔ ").append(operacao).append("\n\n");
                 encontrouRegistros = true;
             }
         }
@@ -419,176 +773,340 @@ public class Main {
             relatorioHistorial.append("Nenhuma atividade registrada para este oficial até o momento.");
         }
 
-        JTextArea textArea = new JTextArea(relatorioHistorial.toString());
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new java.awt.Dimension(500, 300));
+        // 5. Área de texto rolável para o histórico
+        JTextArea areaTexto = new JTextArea(relatorioHistorial.toString());
+        areaTexto.setEditable(false);
+        areaTexto.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scrollPane.setMaximumSize(new java.awt.Dimension(400, 350));
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
 
-        JOptionPane.showMessageDialog(
-            null, 
-            scrollPane, 
-            "Relatório de Atividades do Policial", 
-            JOptionPane.INFORMATION_MESSAGE
+        // 6. Montagem
+        painelPrincipal.add(lblTitulo);
+        painelPrincipal.add(Box.createVerticalStrut(15));
+        painelPrincipal.add(separador);
+        painelPrincipal.add(Box.createVerticalStrut(15));
+        painelPrincipal.add(painelDados);
+        painelPrincipal.add(Box.createVerticalStrut(10));
+        painelPrincipal.add(scrollPane);
+        painelPrincipal.add(Box.createVerticalGlue());
+
+        // 7. Fundo rosa (Tamanho Fixo 500x600)
+        JPanel painelFundo = new JPanel(new java.awt.BorderLayout());
+        painelFundo.setBackground(new Color(248, 200, 220));
+        painelFundo.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        painelFundo.setPreferredSize(new java.awt.Dimension(500, 600)); 
+        painelFundo.add(painelPrincipal, java.awt.BorderLayout.CENTER);
+
+        JOptionPane.showOptionDialog(
+            null, painelFundo, "Relatório de Atividades", 
+            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, 
+            null, new Object[]{"Voltar"}, "Voltar"
         );
 
         chamarMenuPolicial();
     }
 
-    public static void chamarMenuCidadao() {
-        String[] botoesMenu = {
-            "Registrar Boletim", 
-            "Verificar Status", 
-            "Meus Antecedentes", 
+    // =========================================================================
+    //  MENU DO CIDADÃO
+    // =========================================================================
+
+   public static void chamarMenuCidadao() {
+        // Emojis adicionados para dar uma cara mais moderna
+        String[] opcoes = {
+           "Registrar Boletim",
+            "Verificar Status",
+            "Meus Antecedentes",
             "Sair"
         };
 
-        int escolha = JOptionPane.showOptionDialog(
-            null,
-            "=== PAINEL DO CIDADÃO ===\nUsuário logado: " + usuarioLogado.getNome() + "\n\nSelecione a ação desejada abaixo:",
-            "Menu Principal",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            botoesMenu,
-            botoesMenu[0] 
-        );
+        while (true) {
+            // Criando uma mensagem de boas-vindas usando HTML para formatar melhor
+            String mensagemBoasVindas = "<html><center>"
+                    + "<b style='font-size:14px; color:#BE5A8C;'>Painel de Controle</b><br><br>"
+                    + "Olá, <b>" + usuarioLogado.getNome() + "</b>!<br>"
+                    + "O que você deseja fazer hoje?</center></html>";
 
-        switch (escolha) {
-            case 0:
-                registrarBoletim();
-                break;
-            case 1:
-                verificarStatusBoletim();
-                break;
-            case 2:
-                verificarAntecedentesCidadao();
-                break;
-            case 3:
-            case -1: // Caso o usuário feche a janela no "X"
-                JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
-                usuarioLogado = null; // Limpa o usuário logado
-                telaInicial(); // Retorna para a tela de login inicial
-                break;
+            int escolha = exibirMenu(
+                "Painel do Cidadão",
+                mensagemBoasVindas, // Substituímos o texto antigo por essa variável
+                opcoes
+            );
+
+            switch (escolha) {
+                case 0:  registrarBoletim();             break;
+                case 1:  verificarStatusBoletim();       break;
+                case 2:  verificarAntecedentesCidadao(); break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Sessão encerrada com sucesso.");
+                    usuarioLogado = null;
+                    telaInicial();
+                    return;
+            }
         }
     }
 
     public static void registrarBoletim() {
-        JTextField campoData = new JTextField();
-        JTextField campoRelato = new JTextField();
-        JTextField campoEvidencias = new JTextField();
-        
-        String[] opcoesClassificacao = {
-            "Feminicídio", 
-            "Agressão", 
-            "Violência Doméstica", 
-            "Sequestro"
-        };
-        JComboBox<String> comboClassificacao = new JComboBox<>(opcoesClassificacao);
+        while (true) {
+            JTextField campoData       = campoCriado();
+            JTextField campoRelato     = campoCriado();
+            JTextField campoEvidencias = campoCriado();
+            JComboBox<String> combo = new JComboBox<>(new String[]{"Feminicídio", "Agressão", "Violência Doméstica", "Sequestro"});
+            combo.setFont(FONTE_CAMPO);
 
-        Object[] formularioBoletim = {
-            "Data do Ocorrido (DD/MM/AAAA):", campoData,
-            "Relato detalhado do fato:", campoRelato,
-            "Evidências iniciais (se houver):", campoEvidencias,
-            "Classificação da Ocorrência:", comboClassificacao
-        };
+            JPanel form = criarPainelForm(
+                "Data do Ocorrido (DD/MM/AAAA):",   campoData,
+                "Relato detalhado do fato:",        campoRelato,
+                "Evidências iniciais (se houver):", campoEvidencias,
+                "Classificação da Ocorrência:",     combo
+            );
 
-        int resultado = JOptionPane.showConfirmDialog(
-            null, 
-            formularioBoletim, 
-            "Formulário de Boletim de Ocorrência", 
-            JOptionPane.OK_CANCEL_OPTION
-        );
+            // Formulário padronizado
+            if (exibirFormulario("Boletim de Ocorrência", form) != JOptionPane.OK_OPTION) return;
 
-        if (resultado == JOptionPane.OK_OPTION) {
-            String data = campoData.getText();
-            String relato = campoRelato.getText();
-            String evidencias = campoEvidencias.getText();
-            String escolhaClasse = (String) comboClassificacao.getSelectedItem();
+            String data = campoData.getText().trim();
+            String relato = campoRelato.getText().trim();
+            String evidencias = campoEvidencias.getText().trim();
 
-            UmaClassificacao.OpcaoViolencia opcaoEnum = UmaClassificacao.OpcaoViolencia.AGRESSAO; // Padrão
-            
-            if (escolhaClasse != null) {
-                switch (escolhaClasse) {
-                    case "Feminicídio":
-                        opcaoEnum = UmaClassificacao.OpcaoViolencia.FEMINICIDIO;
-                        break;
-                    case "Agressão":
-                        opcaoEnum = UmaClassificacao.OpcaoViolencia.AGRESSAO;
-                        break;
-                    case "Violência Doméstica":
-                        opcaoEnum = UmaClassificacao.OpcaoViolencia.VIOLENCIA_DOMESTICA;
-                        break;
-                    case "Sequestro":
-                        opcaoEnum = UmaClassificacao.OpcaoViolencia.SEQUESTRO;
-                        break;
-                }
+            if (data.isEmpty() || relato.isEmpty()) {
+                aviso("Data e relato são obrigatórios!", "Erro");
+                continue;
+            }
+            if (!isDataValida(data) || parseData(data).isAfter(LocalDate.now())) {
+                erro("Data inválida ou futura!", "Erro");
+                continue;
             }
 
-            classificacaoBoletim = new UmaClassificacao(opcaoEnum);
+            UmaClassificacao.OpcaoViolencia op = UmaClassificacao.OpcaoViolencia.AGRESSAO;
+            switch ((String) combo.getSelectedItem()) {
+                case "Feminicídio": op = UmaClassificacao.OpcaoViolencia.FEMINICIDIO; break;
+                case "Violência Doméstica": op = UmaClassificacao.OpcaoViolencia.VIOLENCIA_DOMESTICA; break;
+                case "Sequestro": op = UmaClassificacao.OpcaoViolencia.SEQUESTRO; break;
+            }
 
-            int idAleatorio = (int) (Math.random() * 1000); 
+            classificacaoBoletim = new UmaClassificacao(op);
+            int idAleatorio = (int) (Math.random() * 9000) + 1000;
             boletimCadastrado = new UmBoletim(idAleatorio, relato, data, evidencias);
             boletimCadastrado.adicionarClassificacao(classificacaoBoletim);
-
             statusBoletim = new UmStatus("registrado");
             boletimCadastrado.atualizarStatus(statusBoletim);
 
-            JOptionPane.showMessageDialog(
-                null, 
-                "=== BOLETIM REGISTRADO COM SUCESSO ===\n\n" +
-                "Número do BO: " + idAleatorio + "\n" +
-                "Classificação: " + classificacaoBoletim.getTipoClassificacao() + "\n" + 
-                "Status Atual: " + statusBoletim.getTipo() + "\n\n" +
-                "O caso foi registrado e aguarda análise.",
-                "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-            
-            System.out.println("\n-> [POO VALIDAÇÃO] Novo Boletim e Classificação vinculados:");
-            System.out.println(classificacaoBoletim.toString());
-            statusBoletim.identificarStatus();
+            sucesso("Boletim " + idAleatorio + " registrado com sucesso!");
+            return;
         }
-
-        chamarMenuCidadao(); 
     }
 
-    public static void verificarStatusBoletim() {
+   public static void verificarStatusBoletim() {
         if (boletimCadastrado == null || statusBoletim == null) {
             JOptionPane.showMessageDialog(
                 null, 
                 "Você não possui nenhum boletim cadastrado nesta sessão.\nPor favor, registre uma ocorrência primeiro.", 
-                "Nenhum Registro Encontrado", 
+                "Nenhum Registro", 
                 JOptionPane.WARNING_MESSAGE
             );
-        } else {
-            String relatorio = "=== CONSULTA DE BOLETIM ===\n\n" +
-                               "Buscando registros vinculados ao usuário: " + usuarioLogado.getNome() + "\n\n" +
-                               "• Classificação Atribuída: " + classificacaoBoletim.getTipoClassificacao() + "\n" +
-                               "• Status do Processo: " + statusBoletim.getTipo() + "\n\n" +
-                               "Detalhamento do Sistema: O caso foi registrado e aguarda análise.";
-            
-            JOptionPane.showMessageDialog(null, relatorio, "Acompanhamento de Ocorrência", JOptionPane.INFORMATION_MESSAGE);
-            
-            System.out.println("\n-> [POO VALIDAÇÃO] Status consultado pelo usuário:");
-            statusBoletim.identificarStatus();
+            chamarMenuCidadao(); 
+            return;
         }
+
+        // 1. Painel principal (fundo branco)
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBackground(Color.WHITE);
+        painelPrincipal.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+
+        // 2. Título
+        JLabel lblTitulo = new JLabel("STATUS DO BOLETIM");
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(136, 14, 79)); 
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JSeparator separador = new JSeparator();
+        separador.setForeground(new Color(244, 143, 177));
+        separador.setMaximumSize(new java.awt.Dimension(400, 5));
+
+        // 3. Detalhes (alinhados à esquerda)
+        JPanel painelDados = new JPanel();
+        painelDados.setLayout(new BoxLayout(painelDados, BoxLayout.Y_AXIS));
+        painelDados.setBackground(Color.WHITE);
+        painelDados.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelDados.setMaximumSize(new java.awt.Dimension(400, 80)); 
+
+        JLabel lblSub = new JLabel("Detalhes da Ocorrência:");
+        lblSub.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        
+        JLabel lblNome = new JLabel("Cidadão: " + usuarioLogado.getNome());
+        lblNome.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        
+        JLabel lblClasse = new JLabel("Classificação: " + classificacaoBoletim.getTipoClassificacao());
+        lblClasse.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        painelDados.add(lblSub);
+        painelDados.add(Box.createVerticalStrut(5));
+        painelDados.add(lblNome);
+        painelDados.add(lblClasse);
+
+        // 4. Caixa de Status (Fundo azul claro, borda azul mais forte)
+        JPanel painelStatus = new JPanel();
+        painelStatus.setLayout(new BoxLayout(painelStatus, BoxLayout.Y_AXIS));
+        painelStatus.setBackground(new Color(227, 242, 253)); 
+        painelStatus.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 5, 0, 0, new Color(33, 150, 243)), 
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        painelStatus.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelStatus.setMaximumSize(new java.awt.Dimension(400, 80));
+
+        JLabel lblStatus = new JLabel("Status Atual: " + statusBoletim.getTipo().toUpperCase());
+        lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblStatus.setForeground(new Color(21, 101, 192)); 
+        
+        JLabel lblInfo = new JLabel("O caso foi registrado e aguarda análise.");
+        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        painelStatus.add(lblStatus);
+        painelStatus.add(Box.createVerticalStrut(8));
+        painelStatus.add(lblInfo);
+
+        // 5. Montagem
+        painelPrincipal.add(lblTitulo);
+        painelPrincipal.add(Box.createVerticalStrut(15));
+        painelPrincipal.add(separador);
+        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(painelDados);
+        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(painelStatus);
+        painelPrincipal.add(Box.createVerticalGlue()); // Joga tudo pra cima
+
+        // 6. Fundo rosa (Tamanho Fixo 500x600)
+        JPanel painelFundo = new JPanel(new java.awt.BorderLayout());
+        painelFundo.setBackground(new Color(248, 200, 220));
+        painelFundo.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        painelFundo.setPreferredSize(new java.awt.Dimension(500, 600)); 
+        painelFundo.add(painelPrincipal, java.awt.BorderLayout.CENTER);
+
+        JOptionPane.showOptionDialog(
+            null, painelFundo, "Acompanhamento de Ocorrência", 
+            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, 
+            null, new Object[]{"Voltar"}, "Voltar"
+        );
+        
+        System.out.println("\n-> [POO VALIDAÇÃO] Status consultado pelo usuário:");
+        statusBoletim.identificarStatus();
+        
         chamarMenuCidadao(); 
     }
 
-    public static void verificarAntecedentesCidadao() {
+ public static void verificarAntecedentesCidadao() {
         Antecedentes ficha = new Antecedentes(0, false, 777, "Nenhuma", "Cidadão ficha limpa");
-        
-        String relatorio = "=== MINHA CERTIDÃO DE ANTECEDENTES ===\n\n" +
-                           "Consulta realizada no Banco de Dados Criminal para: " + usuarioLogado.getNome() + "\n" +
-                           "CPF: " + usuarioLogado.getCpf() + "\n\n" + // Puxando do usuário real logado!
-                           "• Status da Ficha: NADA CONSTA\n" +
-                           "• Histórico: Cidadão ficha limpa\n" +
-                           "• Registros criminais ativos: 0\n\n" +
-                           "Sua situação cadastral perante a justiça está REGULAR.";
 
-        JOptionPane.showMessageDialog(null, relatorio, "Certidão Eletrônica", JOptionPane.INFORMATION_MESSAGE);
+        // 1. Painel principal (fundo branco)
+        JPanel painelPrincipal = new JPanel();
+        painelPrincipal.setLayout(new BoxLayout(painelPrincipal, BoxLayout.Y_AXIS));
+        painelPrincipal.setBackground(Color.WHITE);
+        painelPrincipal.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+
+        // 2. Título
+        JLabel lblTitulo = new JLabel("FICHA DE ANTECEDENTES");
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(136, 14, 79)); // Rosa escuro
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // 3. Linha divisória
+        JSeparator separador = new JSeparator();
+        separador.setForeground(new Color(244, 143, 177));
+        separador.setMaximumSize(new java.awt.Dimension(400, 5));
+
+        // 4. Dados do cidadão (alinhados à esquerda)
+        JPanel painelDados = new JPanel();
+        painelDados.setLayout(new BoxLayout(painelDados, BoxLayout.Y_AXIS));
+        painelDados.setBackground(Color.WHITE);
+        painelDados.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelDados.setMaximumSize(new java.awt.Dimension(400, 80)); 
+
+        JLabel lblSub = new JLabel("Dados do Cidadão:");
+        lblSub.setFont(new Font("Segoe UI", Font.BOLD, 14));
         
-        System.out.println("\n-> [POO VALIDAÇÃO] Usuário puxou a própria certidão de antecedentes:");
+        JLabel lblNome = new JLabel("Nome: " + usuarioLogado.getNome());
+        lblNome.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        
+        JLabel lblCpf = new JLabel("CPF: " + usuarioLogado.getCpf());
+        lblCpf.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        painelDados.add(lblSub);
+        painelDados.add(Box.createVerticalStrut(5));
+        painelDados.add(lblNome);
+        painelDados.add(lblCpf);
+
+        // 5. Caixa de Status (Fundo cinza claro, borda verde na esquerda)
+        JPanel painelStatus = new JPanel();
+        painelStatus.setLayout(new BoxLayout(painelStatus, BoxLayout.Y_AXIS));
+        painelStatus.setBackground(new Color(245, 245, 245));
+        painelStatus.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 5, 0, 0, new Color(76, 175, 80)), // Borda verde
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+        painelStatus.setAlignmentX(Component.CENTER_ALIGNMENT);
+        painelStatus.setMaximumSize(new java.awt.Dimension(400, 90));
+
+        JLabel lblStatus = new JLabel("Status: NADA CONSTA");
+        lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblStatus.setForeground(new Color(46, 125, 50)); // Verde escuro
+        
+        JLabel lblHist = new JLabel("Histórico: Cidadão ficha limpa");
+        lblHist.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        
+        JLabel lblOcorrencias = new JLabel("Ocorrências ativas: 0");
+        lblOcorrencias.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        painelStatus.add(lblStatus);
+        painelStatus.add(Box.createVerticalStrut(8));
+        painelStatus.add(lblHist);
+        painelStatus.add(lblOcorrencias);
+
+        // 6. Montando o painel principal
+        painelPrincipal.add(lblTitulo);
+        painelPrincipal.add(Box.createVerticalStrut(15));
+        painelPrincipal.add(separador);
+        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(painelDados);
+        painelPrincipal.add(Box.createVerticalStrut(20));
+        painelPrincipal.add(painelStatus);
+        
+        // Empurra todo o conteúdo para cima, impedindo que fique esticado no meio da janela
+        painelPrincipal.add(Box.createVerticalGlue()); 
+
+        JPanel painelFundo = new JPanel(new java.awt.BorderLayout());
+        painelFundo.setBackground(new Color(248, 200, 220));
+        painelFundo.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        painelFundo.setPreferredSize(new java.awt.Dimension(500, 600)); 
+        
+        painelFundo.add(painelPrincipal, java.awt.BorderLayout.CENTER);
+
+        // 8. Exibição da janela
+        JOptionPane.showOptionDialog(
+            null, 
+            painelFundo, 
+            "Consulta de Antecedentes", 
+            JOptionPane.DEFAULT_OPTION, 
+            JOptionPane.PLAIN_MESSAGE, 
+            null, 
+            new Object[]{"Voltar"}, 
+            "Voltar"
+        );
+        
+        System.out.println("\n-> [POO VALIDAÇÃO] Usuário consultou a própria ficha de antecedentes:");
         ficha.verificarAntecedentes();
         
         chamarMenuCidadao(); 
