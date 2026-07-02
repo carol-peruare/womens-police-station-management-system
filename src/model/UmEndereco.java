@@ -2,6 +2,8 @@ package model;
 import java.util.List;
 
 public class UmEndereco{
+    private static int contadorId = 1; // Contador para gerar IDs únicos
+    private int id; // ID único do endereço
     private String rua;
     private String cep;
     private String bairro;
@@ -9,6 +11,7 @@ public class UmEndereco{
     private String complemento;
 
     public UmEndereco(String rua, String cep, String bairro, String numero, String complemento){
+        this.id = contadorId++;
         this.rua = rua;
         this.cep = cep;
         this.bairro = bairro;
@@ -16,6 +19,10 @@ public class UmEndereco{
         this.complemento = complemento;
     }
     // getters e setters
+    public int getId() {
+        return id;
+    }
+
     public String getRua() {
         return rua;
     }

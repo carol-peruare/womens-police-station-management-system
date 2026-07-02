@@ -42,7 +42,7 @@ public class UmUsuario extends UmaPessoa{
     // Adicionar endereço 
     public void adicionarEndereco(String rua, String numero, String cidade, String estado, String cep) {
         UmEndereco novoEndereco = new UmEndereco(rua, numero, cidade, estado, cep);
-        enderecos.add(novoEndereco);
+        this.endereco_id = novoEndereco.getId(); // Atribui o ID do novo endereço ao atributo da pessoa
         System.out.println("Endereço cadastrado no perfil de " + this.nome);
     }
 

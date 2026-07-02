@@ -1,14 +1,11 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class UmaPessoa {
     protected static int contadorId = 1;
     protected String nome, cpf, email, data_Nasc, senha, telefone;
     protected int id_pessoa;
     protected String codigoIdentificador;
-    protected List<UmEndereco> enderecos;
+    protected int endereco_id;
     protected boolean autenticado;
 
     public UmaPessoa(String nome, String cpf, String email, String data_Nasc, String senha, String telefone, String codigoIdentificador) {
@@ -21,7 +18,7 @@ public class UmaPessoa {
         this.telefone = telefone;
         this.codigoIdentificador = codigoIdentificador;
         this.autenticado = false; // Usuário/Policial começa deslogado por padrão
-        this.enderecos = new ArrayList<>();
+        this.endereco_id = 0; // Inicialmente, a pessoa não tem um endereço associado
     }
 
     // getters
@@ -31,6 +28,7 @@ public class UmaPessoa {
     public String getTelefone() { return telefone; }
     public String getCodigoIdentificador() { return codigoIdentificador; }
     public boolean isAutenticado() { return autenticado; }
+    public int getEnderecoId() { return endereco_id; }
 
     public String getSenha() {
         return this.senha; 
